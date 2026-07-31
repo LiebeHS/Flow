@@ -1,0 +1,44 @@
+/* RESET DINAMICO Y MODERNO (EL RESET ES PARA QUITAR LOS MARGENES Y PROPIEDADES
+ QUE LOS NAVEGADORES TIENEN POR DEFECTO*/
+
+
+*,
+*::before,
+*::after{
+    box-sizing: border-box;
+}
+   
+* {
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+svg{
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select{
+    font: inherit;
+}
+
+ul[class],
+ol[class]{
+    list-style: none;
+    padding: 0;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}

@@ -1,0 +1,68 @@
+/*Archivo para el despliegue de todos los colores de la app */
+:root {
+    /*color de la interfaz, tonos grises */
+    --color-bg: #f7f8fa;    /*Fondo de la pagina*/
+    --color-surface: #ffffff;  /*tarjetas, paneles, etc*/
+    --color-surface-alt: #f1f3f5;/*superficies sutil alterna*/
+    --color-border: #e3e7eb;
+    --color-border-strong: #cbd2d9;
+
+    /*colores de los textos*/
+    --color-text: #003049; /*azul navy, texto principal*/
+    --color-text-second: #5a6b78; /*texto secundario*/
+    --color-text-sutil: #8A99A5; /*texto ocasional o particular*/
+
+    /*Colores fuertes o acentos */
+    --color-accent: #003049;
+    --color-accent-hover: #00476b;/*color cuando se hace hover sobre algún elemento*/
+    --color-on-accent: #ffffff; /*texto sobre el acento*/
+
+    /*Colores: estados, alertas, progreso*/
+    --color-danger: #D62828;
+    --color-warning: #fcbf49;
+    --color-progress: #F77F00;
+    --color-success: #5C8A3A;
+    --color-success-bg: #EAF1E0;
+    --color-succes-text: #38571F;
+
+    /*Espaciado (escala de 4px)*/
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2x1: 48px;
+
+      /*  Tipografía  */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.5rem;     /* 24px */
+  --text-2xl: 2rem;      /* 32px */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 600;
+
+  /*  Bordes redondeados  */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /*  Sombras suaves (tintadas de navy)  */
+  --shadow-sm: 0 1px 2px rgba(0, 48, 73, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 48, 73, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 48, 73, 0.12);
+
+  /*  Transiciones  */
+  --transition-fast: 150ms ease; /*Ease dicta la velocidad a la que ocurren las animaciones o transiciones*/
+  --transition-base: 200ms ease;
+
+
+
+
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="css/main.css">
+    <title>Flow - Juntas semanales</title>
+    <link rel="icon" href="assets/flowlogo.PNG" type="image/x-icon">
+</head>
+<body>
+
+    <!-- Encabezdo global de Flow-->
+     <header class="app-header">
+        <span class="app-header__brand"></span>
+        <img class="app-header__logo" src="assets/flowtext.PNG" alt="Logo de Flow" >
+      <!---->
+     </header>
+
+     <!--Contenido principal: el detalle de UNA reunión-->
+     <main class="meeting">
+       
+        <header class="meeting__header">
+            <h1 class="meeting__title">Reunión Semanal</h1>
+
+             <dl class="info-meeting">
+                <dt>Fecha</dt>
+                <dd>-</dd>
+                <dt>Estado</dt>
+                <dd>-</dd>
+                <dt>Miembros</dt>
+                <!--Añadir dinamicamente todos los miembros-->
+                <dd>-</dd>
+            </dl>
+
+        </header>
+
+        <section class="meeting-section" id="objetivos" aria-labelledby="objetivos-title">
+            <h2 id="objetivos-title">Objetivos de la reunión</h2>
+            <p class="editable-list__counter"></p>
+
+            <ul class="editable-list__list"></ul>
+            
+
+            <div class="editable-list__form">
+                <input type="text" class="editable-list__input" placeholder="Nuevo objetivo..." aria-label="Escribe aqui tu objetivo" > 
+                <button type="button" class="editable-list__add">Agregar</button>
+
+            </div>
+        </section>
+
+
+        <!-- <section class="meeting-section" id="asuntos" aria-labelledby="asuntos-title">
+            <h2 id="asuntos-title">Asuntos generales</h2>
+            <p class="editable-list__counter"></p>
+
+            <ul class="editable-list__list" ></ul>
+
+            <div class="editable-list__form">
+                <input type="text" class="editable-list__input" placeholder="Nuevo asunto..." aria-label="Escribe tu asunto" >
+                <button type="button" class="editable-list__add">Agregar</button> 
+            </div>
+        </section> -->
+
+
+        <!--AQUI ES DONDE MÁS ENFÁSIS SE DEBERÁ PONER, YA QUE ES EN DONDE MÁS TIEMPO SE TOMA EN LAS REUNIONES-->
+         <section class="meeting-section" id="desarrollo" aria-labelledby="desarrollo-title">
+            <h2 id="desarrollo-title">Desarrollo de la reunión</h2>
+            <div class="development__table" ></div>
+        </section>
+
+         <section class="meeting-section" id="compromisos" aria-labelledby="compromisos-title">
+  <h2 id="compromisos-title">Compromisos</h2>
+
+  <ul class="commitment-list__list"></ul>
+
+  <button type="button" class="commitment-list__add">+ Nuevo compromiso</button>
+
+  <dialog class="commitment-list__dialog">
+    <form class="commitment-list__form">
+      <h3 class="commitment-list__form-title">Nuevo compromiso</h3>
+
+      <label class="field">
+        <span class="field__label">Colaboradores</span>
+        <input type="text" name="colaboradores" class="field__input"
+               placeholder="Ana, Luis, María" required>
+      </label>
+
+      <label class="field">
+        <span class="field__label">Descripción</span>
+        <input type="text" name="descripcion" class="field__input" required>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">Fecha de inicio</span>
+          <input type="date" name="fechaInicio" class="field__input">
+        </label>
+        <label class="field">
+          <span class="field__label">Fecha límite</span>
+          <input type="date" name="fechaLimite" class="field__input">
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">Estado</span>
+          <select name="estado" class="field__input">
+            <option value="pendiente">Pendiente</option>
+            <option value="en-progreso">En progreso</option>
+            <option value="completado">Completado</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Prioridad</span>
+          <select name="prioridad" class="field__input">
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="commitment-list__form-actions">
+        <button type="button" class="commitment-list__cancel">Cancelar</button>
+        <button type="submit" class="commitment-list__save">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+</section>
+
+         <section class="meeting-section" aria-labelledby="otros-title">
+            <h2 id="otros-title">Otros Asuntos</h2>
+        </section>
+
+        <section class="meeting-section" aria-labelledby="competitividad-title">
+            <h2 id="competitividad-title">Competitividad</h2>
+        </section>
+
+        <section class="meeting-section" aria-labelledby="acuerdos-title">
+            <h2 id="acuerdos-title">Acuerdos</h2>
+        </section>
+
+       <section class="meeting-section" aria-labelledby="enlaces-title">
+        <h2 id="enlaces-title">Enlaces</h2>
+        <ul class="enlaces__list">
+            <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Ejemplo</a></li>
+            <li><a href="...">Otro recurso</a></li>
+        </ul>
+        </section> 
+
+        <section class="meeting-section" aria-labelledby="reflexion-title">
+            <h2 id="reflexion-title">Reflexión Grupal</h2>
+        </section>
+        
+
+     </main>
+          <script type="module" src="js/main.js"></script> <!--Vinculación del JS-->  
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+.commitment-list__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.commitment-list__add {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.commitment-list__add:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.commitment-list__dialog {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  max-width: 480px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+
+.commitment-list__dialog::backdrop {
+  background-color: rgba(0, 48, 73, 0.4);
+}
+
+.commitment-list__form-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-lg);
+}
+
+.commitment-list__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+}
+
+.field__input {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 48, 73, 0.12);
+}
+
+.field-row {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+.commitment-list__form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.commitment-list__cancel,
+.commitment-list__save {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.commitment-list__cancel {
+  border: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-text-muted);
+}
+
+.commitment-list__save {
+  border: none;
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.commitment-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+}
+
+.commitment-card--alta { border-left-color: var(--color-danger); }
+.commitment-card--media { border-left-color: var(--color-progress); }
+.commitment-card--baja { border-left-color: var(--color-success); }
+
+.commitment-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xs);
+}
+
+.commitment-card__title {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+
+.commitment-card__badge {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-lg);
+}
+
+.commitment-card__badge--pendiente {
+  background-color: var(--color-warning);
+  color: #412402;
+}
+
+.commitment-card__badge--en-progreso {
+  background-color: var(--color-progress);
+  color: #ffffff;
+}
+
+.commitment-card__badge--completado {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.commitment-card__meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.commitment-card__actions{
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+.commitment-card__delete{
+    border: none;
+    background: none;
+    color: var(--color-text-sutil);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    padding: 2px var(--space-2xs);
+    border-radius: var(--radius-sm);
+    transition: color   var(--transition-fast);
+}
+
+.commitment-card__delete:hover{
+    color: var(--color-danger);
+}
