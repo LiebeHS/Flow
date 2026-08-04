@@ -10,7 +10,7 @@
     /*colores de los textos*/
     --color-text: #003049; /*azul navy, texto principal*/
     --color-text-second: #5a6b78; /*texto secundario*/
-    --color-text-sutil: #8A99A5; /*texto ocasional o particular*/
+    --color-text-subtle: #8A99A5; /*texto ocasional o particular*/
 
     /*Colores fuertes o acentos */
     --color-accent: #003049;

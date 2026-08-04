@@ -12,27 +12,37 @@
 
     <!-- Encabezdo global de Flow-->
      <header class="app-header">
-        <span class="app-header__brand"></span>
-        <img class="app-header__logo" src="assets/flowtext.PNG" alt="Logo de Flow" >
-      <!---->
+        <div class="app-header__inner" >
+          <span class="app-header__brand"></span>
+          <img class="app-header__logo" src="assets/flowtext.PNG" alt="Logo de Flow" >
+        </div>
+        <div class="app-header__actions">
+          <button type="button" class="app-header__btn" id="btn-iniciar">Iniciar reunión</button>
+          <button type="button" class="app-header__btn" id="btn-pausar" disabled>Pausar</button>
+          <button type="button" class="app-header__btn app-header__btn--danger" id="btn-terminar" disabled>Terminar</button>
+        </div>
      </header>
 
      <!--Contenido principal: el detalle de UNA reunión-->
      <main class="meeting">
-       
+
+        <div id="vista-historial" class="view">
+          <h1 class="view__title">Reuniones</h1>
+          <div class="historial__list">
+            <!-- Aquí irán las tarjetas de reuniones pasadas (Fase 4) -->
+            <p class="historial__empty">Aún no hay reuniones guardadas.</p>
+          </div>
+        </div>
+        <!-- ===== VISTA REUNIÓN (oculta al entrar) ===== -->
+        <div id="vista-reunion" class="view view--hidden">
+
         <header class="meeting__header">
-            <h1 class="meeting__title">Reunión Semanal</h1>
-
-             <dl class="info-meeting">
-                <dt>Fecha</dt>
-                <dd>-</dd>
-                <dt>Estado</dt>
-                <dd>-</dd>
-                <dt>Miembros</dt>
-                <!--Añadir dinamicamente todos los miembros-->
-                <dd>-</dd>
-            </dl>
-
+          <h1 class="meeting__title">Reunión Semanal</h1>
+          <dl class="info-meeting">
+            <dt>Fecha</dt><dd>-</dd>
+            <dt>Estado</dt><dd>-</dd>
+            <dt>Miembros</dt><dd>-</dd>
+          </dl>
         </header>
 
         <section class="meeting-section" id="objetivos" aria-labelledby="objetivos-title">
@@ -129,32 +139,77 @@
   </dialog>
 </section>
 
-         <section class="meeting-section" aria-labelledby="otros-title">
+         <section class="meeting-section" id="otros" aria-labelledby="otros-title">
             <h2 id="otros-title">Otros Asuntos</h2>
+            <div class="text-section"></div>
         </section>
 
-        <section class="meeting-section" aria-labelledby="competitividad-title">
+        <section class="meeting-section" id="competitividad" aria-labelledby="competitividad-title">
             <h2 id="competitividad-title">Competitividad</h2>
+            <div class="text-section"></div>
         </section>
 
-        <section class="meeting-section" aria-labelledby="acuerdos-title">
+        <section class="meeting-section" id="acuerdos" aria-labelledby="acuerdos-title">
             <h2 id="acuerdos-title">Acuerdos</h2>
+            <div class="text-section"></div>
         </section>
 
-       <section class="meeting-section" aria-labelledby="enlaces-title">
+       <section class="meeting-section" id="enlaces" aria-labelledby="enlaces-title">
         <h2 id="enlaces-title">Enlaces</h2>
-        <ul class="enlaces__list">
-            <li><a href="https://example.com" target="_blank" rel="noopener noreferrer">Ejemplo</a></li>
-            <li><a href="...">Otro recurso</a></li>
-        </ul>
+
+        <ul class="link-list__list"></ul>
+
+        <div class="link-list__form" >
+          <input type="text" class="link-list__title" placeholder="Titulo del enlace" aria-label="Titulo del enlace">
+          <input type="url" class="link-list__url" placeholder="https://..." aria-label="URL del enlace">
+          <button type="button" class="link-list__add"> Agregar </button>
+        </div>
         </section> 
 
-        <section class="meeting-section" aria-labelledby="reflexion-title">
+        <section class="meeting-section" id="reflexion" aria-labelledby="reflexion-title">
             <h2 id="reflexion-title">Reflexión Grupal</h2>
+            <div class="text-section" ></div>
         </section>
         
-
+        </div>
      </main>
+
+      <dialog class="confirm-dialog">
+       <p class="confirm-dialog__message"></p>
+       <div class="confirm-dialog__actions">
+         <button type="button" class="confirm-dialog__cancel">Cancelar</button>
+         <button type="button" class="confirm-dialog__accept">Aceptar</button>
+       </div>
+     </dialog>
+
+     <dialog class="start-dialog">
+  <form class="start-dialog__form">
+    <h3 class="start-dialog__title">Iniciar reunión</h3>
+
+    <div class="field">
+      <span class="field__label">Fecha</span>
+      <span class="start-dialog__date"></span>
+    </div>
+
+    <div class="field">
+      <span class="field__label">Participantes</span>
+      <div class="chips" id="chips-participantes"></div>
+      <input type="text" class="field__input" id="input-participante"
+             placeholder="Escribe un nombre y presiona Enter">
+    </div>
+
+    <div class="field">
+      <span class="field__label">Duración (minutos)</span>
+      <input type="number" class="field__input" id="input-duracion" value="60" min="1">
+    </div>
+
+    <div class="start-dialog__actions">
+      <button type="button" class="start-dialog__cancel">Cancelar</button>
+      <button type="submit" class="start-dialog__confirm">Iniciar</button>
+    </div>
+  </form>
+</dialog>
+
           <script type="module" src="js/main.js"></script> <!--Vinculación del JS-->  
 
 </body>

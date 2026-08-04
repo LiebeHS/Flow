@@ -1,4 +1,5 @@
 import {loadData, saveData} from "../services/storage.service.js"
+import { confirmDialog } from "../services/confirmDialog.js"
 export function createEditableList({container, itemName, storageKey, onChange}){
     const list = container.querySelector(".editable-list__list")
     const input = container.querySelector(".editable-list__input")
@@ -85,16 +86,17 @@ export function createEditableList({container, itemName, storageKey, onChange}){
         items.push({id: crypto.randomUUID(), texto, done: false});
         render()
     }
-    function removeItem(id){
-        const confirmar = confirm(
-            "¿Estás seguro de eliminar? \nTus datos relacionados a este objetivo en la sección de desarrollo se van a eliminar."
-        );
+    async function removeItem(id) {
+    const confirmado = await confirmDialog(
+        "¿Estás seguro de eliminar? Tus datos relacionados a este objetivo en la sección de desarrollo se van a eliminar."
+    );
 
-        if (!confirmar) return;
+    if (!confirmado) return;
 
-        items = items.filter((data) => data.id !==id);
-        render()
+    items = items.filter((data) => data.id !== id);
+    render();
     }
+
     function toggleItem(id){
         const data = items.find((item)=> item.id === id);
         data.done = !data.done;

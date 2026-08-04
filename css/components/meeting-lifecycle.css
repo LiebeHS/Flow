@@ -1,0 +1,125 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.app-header__actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.app-header__btn {
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.app-header__btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.app-header__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.app-header__btn--danger:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.start-dialog {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  max-width: 440px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+
+.start-dialog::backdrop {
+  background-color: rgba(0, 48, 73, 0.4);
+}
+
+.start-dialog__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin-bottom: var(--space-lg);
+}
+
+.start-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.start-dialog__date {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-lg);
+}
+
+.chip__remove {
+  border: none;
+  background: none;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+}
+
+.chip__remove:hover {
+  color: var(--color-danger);
+}
+
+.start-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.start-dialog__cancel,
+.start-dialog__confirm {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.start-dialog__cancel {
+  border: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-text-muted);
+}
+
+.start-dialog__confirm {
+  border: none;
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}

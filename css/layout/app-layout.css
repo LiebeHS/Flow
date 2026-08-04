@@ -1,9 +1,6 @@
 /*Cabecera global, que se mantenga fija en la parte superior*/
 .app-header {
     height: 64px;
-    display: flex;
-    align-items: center;
-
     position: sticky;
     top:0;
     z-index: 10; /* esta propiedad controla el orden del apilamiento de los elementos superpuestos */
