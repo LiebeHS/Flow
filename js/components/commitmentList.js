@@ -104,7 +104,9 @@ export function createCommitmentList({ container, storageKey }) {
     };
   }
 
-  function fillForm(data) {
+  function fillForm(id) {
+    const commitment = items.find((c) => c.id === id);
+  if (!commitment) return;
     form.elements.colaboradores.value = data.colaboradores.join(", ");
     form.elements.descripcion.value = data.descripcion;
     form.elements.fechaInicio.value = data.fechaInicio;

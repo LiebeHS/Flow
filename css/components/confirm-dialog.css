@@ -11,7 +11,7 @@ dialog{
 }
 
 .confirm-dialog::backdrop {
-  background-color: rgba(0, 48, 73, 0.4);
+  background-color: rgba(255, 255, 255, 0.01);
 }
 
 .confirm-dialog__message {

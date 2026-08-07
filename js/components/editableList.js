@@ -99,7 +99,7 @@ export function createEditableList({container, itemName, storageKey, onChange}){
 
     function toggleItem(id){
         const data = items.find((item)=> item.id === id);
-        data.done = !data.done;
+        item.done = !item.done;
         render()
     }
 //* FUNCIONES QUE VAN A EDITAR EL CONTENIDO

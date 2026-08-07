@@ -9,6 +9,9 @@
 @import "components/confirm-dialog.css";
 @import "layout/view.css";
 @import "components/meeting-lifecycle.css";
+@import "components/timer.css";
+@import "components/history-view.css";
+@import "components/archive-view.css";
 
 body {
     background-color: var(--color-bg);

@@ -90,6 +90,7 @@ export function createDevelopmentTable({ container, storageKey }) {
     persist();
   }
 
+  
   function createAddButton(tipo, label) {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -98,6 +99,8 @@ export function createDevelopmentTable({ container, storageKey }) {
     btn.textContent = label;
     return btn;
   }
+
+
 
   function createBlockElement(block) {
     const wrapper = document.createElement("div");
@@ -282,6 +285,10 @@ function createInsertButton(tipo, label, index) {
     persist();
   }
 
+  function refreshTextAreas(){
+    table.querySelectorAll(".development-block__field").forEach(autoGrow);
+  }
+
   function refreshAvanceUI(wrapper, valor) {
   const bar = wrapper.querySelector(".avance__bar");
   const value = wrapper.querySelector(".avance__value");
@@ -351,7 +358,8 @@ function createInsertButton(tipo, label, index) {
     refreshAvanceUI(block, valor);
   }
 });
-
+  const existente = container.querySelector(".development__edit-toggle");
+if (existente) existente.remove();
   container.insertBefore(createEditToggle(), table);
-  return { setObjetivos };
+  return { setObjetivos, refreshTextAreas };
 }

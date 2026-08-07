@@ -12,11 +12,14 @@
 
     <!-- Encabezdo global de Flow-->
      <header class="app-header">
-        <div class="app-header__inner" >
+        <div class="app-header__inner">
           <span class="app-header__brand"></span>
           <img class="app-header__logo" src="assets/flowtext.PNG" alt="Logo de Flow" >
         </div>
         <div class="app-header__actions">
+          <div class="timer" id="timer">
+            <span class="timer__value">--:--</span>
+          </div>
           <button type="button" class="app-header__btn" id="btn-iniciar">Iniciar reunión</button>
           <button type="button" class="app-header__btn" id="btn-pausar" disabled>Pausar</button>
           <button type="button" class="app-header__btn app-header__btn--danger" id="btn-terminar" disabled>Terminar</button>
@@ -36,15 +39,30 @@
         <!-- ===== VISTA REUNIÓN (oculta al entrar) ===== -->
         <div id="vista-reunion" class="view view--hidden">
 
-        <header class="meeting__header">
-          <h1 class="meeting__title">Reunión Semanal</h1>
-          <dl class="info-meeting">
-            <dt>Fecha</dt><dd>-</dd>
-            <dt>Estado</dt><dd>-</dd>
-            <dt>Miembros</dt><dd>-</dd>
+          <header class="meeting__header" >
+             <h1 class="meeting__title">Reunión Semanal</h1>
+
+          <dl class="meeting__meta">
+            <div class="meeting__meta-row">
+              <dt class="meeting__meta-label">Fecha</dt>
+              <dd class="meeting__meta-value" data-campo="fecha">-</dd>
+            </div>
+            <div class="meeting__meta-row">
+              <dt class="meeting__meta-label">Estado</dt>
+              <dd class="meeting__meta-value" data-campo="estado">-</dd>
+            </div>
+            <div class="meeting__meta-row">
+              <dt class="meeting__meta-label">Miembros</dt>
+              <dd class="meeting__meta-value" data-campo="miembros">-</dd>
+            </div>
           </dl>
+          
         </header>
 
+        <div class="meeting__body" id="meeting__body">
+          <div class="pause-overlay" id="pause-overlay">           
+            <span class="pause-overlay__text">Reunión en pausa</span>
+            </div>
         <section class="meeting-section" id="objetivos" aria-labelledby="objetivos-title">
             <h2 id="objetivos-title">Objetivos de la reunión</h2>
             <p class="editable-list__counter"></p>
@@ -172,6 +190,16 @@
         </section>
         
         </div>
+        </div>
+
+      <div id="vista-archivo" class="view view--hidden">
+        <div class="archive__banner">
+          <button type="button" class="archive__back" id="archive-back">← Volver al historial</button>
+          <span class="archive__label">Reunión archivada · solo lectura</span>
+        </div>
+        <div class="archive__content" id="archive-content"></div>
+      </div>  
+
      </main>
 
       <dialog class="confirm-dialog">
@@ -209,6 +237,7 @@
     </div>
   </form>
 </dialog>
+</div>
 
           <script type="module" src="js/main.js"></script> <!--Vinculación del JS-->  
 

@@ -3,7 +3,7 @@
     height: 64px;
     position: sticky;
     top:0;
-    z-index: 10; /* esta propiedad controla el orden del apilamiento de los elementos superpuestos */
+    z-index: 60; /* esta propiedad controla el orden del apilamiento de los elementos superpuestos */
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
     padding: var(--space-md) var(--space-lg);
@@ -29,43 +29,72 @@
     padding: var(--space-xl) var(--space-lg);
 }
 
-/* Titulo de la reunión */
+/* Título de la reunión */
 .meeting__header {
     margin-bottom: var(--space-xl);
 }
 
-.meeting__title { 
-    font-size: var(--text-2x1);
-    font-weight: var(--weigth-bold);
+.meeting__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
     letter-spacing: -0.02em;
     margin-bottom: var(--space-md);
 }
 
-/*Datos de las reuniones*/
-.info-meeting{
+/* Datos de la reunión (encabezado nuevo) */
+.meeting__meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs) var(--space-lg);
+    flex-direction: column;
+    gap: var(--space-2xs);
+}
+
+.meeting__meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
     font-size: var(--text-sm);
 }
 
-.info-meeting dt{
-    color: var(--color-text-sutil);
-    font-weight: var(--weigth-medium);
+.meeting__meta-label {
+    color: var(--color-text-subtle);
+    min-width: 90px;
 }
 
-.info-meeting dd{
-    color: var(--color-text-muted);
+.meeting__meta-value {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
 }
 
-/*secciones de la reunión*/
-.meeting-section{
+.status-badge {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-lg);
+}
+
+.status-badge--en-curso {
+    background-color: #eef3f7;
+    color: var(--color-accent);
+}
+
+.status-badge--pausada {
+    background-color: var(--color-warning);
+    color: #412402;
+}
+
+.status-badge--terminada {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+}
+
+/* Secciones de la reunión */
+.meeting-section {
     margin-bottom: var(--space-xl);
 }
 
-.meeting-section{
+.meeting-section h2 {
     font-size: var(--text-lg);
-    font-weight: var(--weigth-bold);
+    font-weight: var(--weight-bold);
     margin-bottom: var(--space-md);
     padding-bottom: var(--space-xs);
     border-bottom: 1px solid var(--color-border);

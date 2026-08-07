@@ -1,0 +1,72 @@
+.historial__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.history-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.history-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.history-card__header {
+  display: block;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xs);
+  display: flex ;
+  justify-content: space-between;
+  
+}
+
+.history-card__date {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  flex: 1;
+}
+
+.history-card__badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-lg);
+}
+
+.history-card__badge--cerrado {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.history-card__badge--pendiente {
+  background-color: var(--color-warning);
+  color: #412402;
+}
+
+.history-card__parts {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.history-card__stats {
+  display: flex;
+  gap: var(--space-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.history-card__stats b {
+  color: var(--color-text);
+}

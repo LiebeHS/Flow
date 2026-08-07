@@ -1,6 +1,7 @@
 const vistas = {
   historial: document.querySelector("#vista-historial"),
   reunion: document.querySelector("#vista-reunion"),
+  archivo: document.querySelector("#vista-archivo"),
 };
 
 export function showView(nombre) {

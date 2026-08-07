@@ -1,0 +1,63 @@
+.timer {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-alt);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  transition: opacity var(--transition-fast);
+  cursor: pointer;
+}
+.timer--activo{
+    display:flex
+}
+
+/* Al pasar el mouse: se oculta el valor, queda el hueco tenue */
+.timer--oculto{
+    opacity: 0.3;
+}
+
+.timer--oculto .timer__value{
+    opacity: 0;
+}
+
+/* Cuando el tiempo se acaba */
+.timer--finished {
+  background-color: var(--color-danger);
+  color: #ffffff;
+}
+
+.meeting__body{
+    position: relative;
+}
+
+.pause-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--space-2xs);
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(2px);
+}
+
+.pause-overlay--visible {
+  display: flex;
+}
+
+.pause-overlay__text {  
+    position: absolute;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
