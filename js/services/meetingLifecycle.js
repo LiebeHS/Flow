@@ -17,6 +17,7 @@ export function initMeetingLifecycle({ onStart, onPause, onResume, onEnd }) {
   const chipsContainer = document.querySelector("#chips-participantes");
   const participanteInput = document.querySelector("#input-participante");
   const duracionInput = document.querySelector("#input-duracion");
+  const avisoParticipantes = document.querySelector("#aviso-participantes");
 
   let participantes = [];
   let pausada = false;
@@ -51,7 +52,10 @@ export function initMeetingLifecycle({ onStart, onPause, onResume, onEnd }) {
 
     function actualizarBotonIniciar() {
   const confirmBtn = dialog.querySelector(".start-dialog__confirm");
-  confirmBtn.disabled = participantes.length < 2;
+  const faltanParticipantes = participantes.length < 2;
+
+  confirmBtn.diabled = faltanParticipantes;
+  avisoParticipantes.classList.toggle("start-dialog__aviso--visible", faltanParticipantes)
 }
 
   function openDialog() {

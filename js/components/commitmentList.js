@@ -29,7 +29,7 @@ export function createCommitmentList({ container, storageKey }) {
     card.classList.add("commitment-card");
     card.classList.add(`commitment-card--${data.prioridad}`);
     card.dataset.id = data.id;
-    card.title = "Doble clic para editar";
+    card.title = "clic para editar";
 
     const header = document.createElement("div");
     header.classList.add("commitment-card__header");
