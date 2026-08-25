@@ -1,0 +1,660 @@
+/* =========================================================
+   FLOW - REGISTRO DE USUARIOS
+   ========================================================= */
+
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.user-registration-form {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    column-gap: 24px;
+    row-gap: 20px;
+}
+
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
+
+.user-registration-form .form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.user-registration-form .form-group label {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #4f5665;
+}
+
+
+.user-registration-form .form-group input {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce2ea;
+
+    border-radius: 8px;
+
+    background-color: #ffffff;
+
+    color: var(--color-text);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+.user-registration-form .form-group input:hover {
+    border-color: #c5ccd6;
+}
+
+
+.user-registration-form .form-group input:focus {
+    border-color: #4298e6;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            66,
+            152,
+            230,
+            0.12
+        );
+
+    background-color: #ffffff;
+}
+
+
+/* =========================================================
+   NOMBRE
+   Ocupa todo el ancho
+   ========================================================= */
+
+.user-registration-form .form-group:nth-child(1) {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   MENSAJE DE VALIDACIÓN
+   ========================================================= */
+
+.user-registration-form__message {
+    display: none;
+
+    grid-column: 1 / -1;
+
+    padding: 11px 14px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+.user-registration-form__message--error {
+    display: block;
+
+    background-color: #fff0f0;
+
+    color: #a52b2b;
+
+    border: 1px solid #f3cccc;
+}
+
+
+.user-registration-form__message--success {
+    display: block;
+
+    background-color: #edf9f1;
+
+    color: #247442;
+
+    border: 1px solid #ccebd6;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.user-registration-form__actions {
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding-top: 10px;
+
+    border-top: 1px solid var(--color-border);
+}
+
+
+/* =========================================================
+   BOTÓN REGISTRAR
+   ========================================================= */
+
+.user-registration-form__actions .users-view__add {
+    min-width: 155px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .user-registration-form {
+        grid-template-columns: 1fr;
+
+        row-gap: 18px;
+    }
+
+
+    .user-registration-form .form-group:nth-child(1) {
+        grid-column: 1;
+    }
+
+
+    .user-registration-form__message {
+        grid-column: 1;
+    }
+
+
+    .user-registration-form__actions {
+        grid-column: 1;
+
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+
+    .user-registration-form__actions button {
+        width: 100%;
+    }
+
+}
+
+/* =========================================================
+   TABLA DE USUARIOS
+   ========================================================= */
+
+.users-table {
+    width: 100%;
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-surface);
+}
+
+
+.users-table__header,
+.users-table__row {
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1.2fr
+        1.7fr
+        120px;
+
+    align-items: center;
+}
+
+
+.users-table__header {
+
+    min-height: 48px;
+
+    padding: 0 20px;
+
+    background: #f7f9fc;
+
+    border-bottom:
+        1px solid var(--color-border);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: var(--color-text-muted);
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+}
+
+
+.users-table__row {
+
+    min-height: 64px;
+
+    padding: 0 20px;
+
+    border-bottom:
+        1px solid var(--color-border);
+
+    font-size: 14px;
+
+    color: var(--color-text);
+}
+
+
+.users-table__row:last-child {
+    border-bottom: none;
+}
+
+
+.users-table__row:hover {
+    background: #fafcff;
+}
+
+
+.users-table__name {
+    font-weight: 600;
+}
+
+
+.users-table__status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+/* =========================================================
+   SWITCH
+   ========================================================= */
+
+.status-switch {
+    position: relative;
+
+    display: inline-block;
+
+    width: 38px;
+    height: 21px;
+}
+
+
+.status-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+
+.status-switch__slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    cursor: pointer;
+
+    background: #cbd2dc;
+
+    border-radius: 999px;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+
+.status-switch__slider::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 17px;
+    height: 17px;
+
+    left: 2px;
+    top: 2px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.2);
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.status-switch input:checked
++ .status-switch__slider {
+
+    background:
+        #4298e6;
+}
+
+
+.status-switch input:checked
++ .status-switch__slider::before {
+
+    transform:
+        translateX(17px);
+}
+
+
+.status-switch input:disabled
++ .status-switch__slider {
+
+    opacity: 0.5;
+
+    cursor: wait;
+}
+
+
+.users-table__status-text {
+
+    min-width: 55px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: var(--color-text-muted);
+}
+
+
+/* =========================================================
+   MENSAJES
+   ========================================================= */
+
+.users-view__loading,
+.users-view__error {
+
+    padding: 40px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    color: var(--color-text-muted);
+}
+
+
+.users-view__error {
+
+    color: #a52b2b;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .users-table {
+        overflow-x: auto;
+    }
+
+
+    .users-table__header,
+    .users-table__row {
+
+        min-width: 700px;
+
+    }
+
+}
+
+/* =========================================================
+   BOTONES DE ESTADO DE USUARIO
+   ========================================================= */
+
+.user-status-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 100px;
+    height: 40px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+/* =========================================================
+   DESACTIVAR
+   ========================================================= */
+
+.user-status-button--deactivate {
+
+    background: #e88989;
+
+    box-shadow:
+        0 4px 10px rgba(220, 100, 100, 0.20);
+}
+
+
+.user-status-button--deactivate:hover {
+
+    background: #dc7777;
+
+    box-shadow:
+        0 6px 14px rgba(220, 100, 100, 0.28);
+
+    transform: translateY(-1px);
+}
+
+
+.user-status-button--deactivate:active {
+
+    transform: translateY(0);
+
+    box-shadow:
+        0 3px 7px rgba(220, 100, 100, 0.20);
+}
+
+
+/* =========================================================
+   ACTIVAR
+   ========================================================= */
+
+.user-status-button--activate {
+
+    background: #78c99a;
+
+    box-shadow:
+        0 4px 10px rgba(80, 170, 110, 0.20);
+}
+
+
+.user-status-button--activate:hover {
+
+    background: #64bb89;
+
+    box-shadow:
+        0 6px 14px rgba(80, 170, 110, 0.28);
+
+    transform: translateY(-1px);
+}
+
+
+.user-status-button--activate:active {
+
+    transform: translateY(0);
+
+    box-shadow:
+        0 3px 7px rgba(80, 170, 110, 0.20);
+}
+
+
+/* =========================================================
+   GUARDANDO
+   ========================================================= */
+
+.user-status-button:disabled {
+
+    opacity: 0.65;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+
+/* ---------------------------------------------------------
+   DESHABILITADO
+   --------------------------------------------------------- */
+
+.user-status-button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+}
+
+
+/* =========================================================
+   CUANDO EXISTEN USUARIOS
+   ========================================================= */
+
+#usuarios-empty[hidden] {
+    display: none !important;
+}
+
+
+#usuarios-loading[hidden] {
+    display: none !important;
+}
+
+/* =========================================================
+   ETIQUETA DE ESTADO
+   ========================================================= */
+
+.user-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 65px;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.user-status--active {
+    background: #e5f6ec;
+    color: #328653;
+}
+
+
+.user-status--inactive {
+    background: #fbe8e8;
+    color: #b34b4b;
+}
+
+/* =========================================================
+   BOTON EDITAR
+   ========================================================= */
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.user-edit-button {
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 9px 14px;
+
+    background-color: #dceeff;
+
+    color: #3f6f91;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.user-edit-button:hover {
+
+    background-color: #c8e5fa;
+
+    transform: translateY(-1px);
+
+}

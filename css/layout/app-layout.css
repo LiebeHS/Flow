@@ -99,3 +99,43 @@
     padding-bottom: var(--space-xs);
     border-bottom: 1px solid var(--color-border);
 }
+
+/* =========================================================
+   CERRAR SESIÓN
+   ========================================================= */
+
+.app-header__logout {
+
+    background: transparent;
+
+    color: #0b4568;
+
+    border: 1px solid #b9d9ea;
+
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.app-header__logout:hover {
+
+    background: #e3f3fb;
+
+    border-color: #8fc8e5;
+
+    color: #073b5c;
+
+}

@@ -1,105 +1,1085 @@
-import { loadData } from "../services/storage.service.js";
-import { capitalizar } from "../utils/capitalize.js";
+/* =========================================================
+   HISTORY VIEW
+   ========================================================= */
 
-const HISTORIAL_KEY = "flow.historial";
+import {
+    capitalizar
+} from "../utils/capitalize.js";
 
-export function createHistoryView({ container, onOpen }) {
-  const list = container.querySelector(".historial__list");
 
-  function resumir(reunion) {
-    const objetivos = reunion.secciones.objetivos || [];
-    const compromisos = reunion.secciones.compromisos || [];
-    const desarrollo = reunion.secciones.desarrollo || {};
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
 
-    const objetivosPendientes = objetivos.filter((o) => !o.done).length;
-    const compromisosPendientes = compromisos.filter((c) => c.estado !== "completado").length;
+const API_URL =
+    "http://localhost:3000/api";
 
-    let puntosPendientes = 0;
-    for (const id in desarrollo) {
-      desarrollo[id].forEach((b) => {
-        if (b.tipo === "punto" && (b.avance ?? 0) < 100) puntosPendientes += 1;
-      });
+
+/* =========================================================
+   CREAR VISTA DE HISTORIAL
+   ========================================================= */
+
+export function createHistoryView({
+    container,
+    onOpen
+}) {
+
+    const list =
+        container.querySelector(
+            ".historial__list"
+        );
+
+
+    /* =====================================================
+       VALIDAR CONTENEDOR
+       ===================================================== */
+
+    if (!list) {
+
+        console.error(
+            "No se encontró .historial__list"
+        );
+
+        return {
+
+            render:
+                () => {}
+
+        };
+
     }
 
-    return {
-      totalObjetivos: objetivos.length,
-      totalCompromisos: compromisos.length,
-      pendientes: objetivosPendientes + compromisosPendientes + puntosPendientes,
-    };
-  }
 
-  function crearTarjeta(reunion, index) {
-    const resumen = resumir(reunion);
+    /* =========================================================
+       FORMATEAR FECHA
+       ========================================================= */
 
-    const d = new Date(reunion.meta.fecha);
-    const dia = String(d.getDate()).padStart(2, "0");
-    const mes = capitalizar(d.toLocaleDateString("es-MX", { month: "long" }));
-    const anio = d.getFullYear();
-    const fecha = `${dia}/${mes}/${anio}`;
-    const numParticipantes = (reunion.meta.participantes || []).length;
+    function formatearFecha(
+        fecha
+    ) {
 
-    const card = document.createElement("article");
-    card.classList.add("history-card");
-    card.dataset.index = index;
+        if (!fecha) {
 
-    const header = document.createElement("div");
-    header.classList.add("history-card__header");
+            return "-";
 
-    const fechaEl = document.createElement("span");
-    fechaEl.classList.add("history-card__date");
-    fechaEl.textContent = fecha;
+        }
 
-    const badge = document.createElement("span");
-    badge.classList.add("history-card__badge");
-    if (resumen.pendientes === 0) {
-      badge.classList.add("history-card__badge--cerrado");
-      badge.textContent = "Todo cerrado";
-    } else {
-      badge.classList.add("history-card__badge--pendiente");
-      badge.textContent = `${resumen.pendientes} pendiente${resumen.pendientes > 1 ? "s" : ""}`;
+
+        const d =
+            new Date(
+                fecha
+            );
+
+
+        if (
+            Number.isNaN(
+                d.getTime()
+            )
+        ) {
+
+            return "-";
+
+        }
+
+
+        const dia =
+            String(
+                d.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const mes =
+            capitalizar(
+                d.toLocaleDateString(
+                    "es-MX",
+                    {
+                        month:
+                            "short"
+                    }
+                )
+            );
+
+
+        const anio =
+            d.getFullYear();
+
+
+        return (
+            `${dia}/${mes}/${anio}`
+        );
+
     }
 
-    header.append(fechaEl, badge);
 
-    const parts = document.createElement("div");
-    parts.classList.add("history-card__parts");
-    parts.textContent = `${numParticipantes} participante${numParticipantes !== 1 ? "s" : ""}`;
+    /* =========================================================
+       FORMATEAR HORA
+       ========================================================= */
 
-    const stats = document.createElement("div");
-    stats.classList.add("history-card__stats");
-    stats.innerHTML =
-      `<span><b>${resumen.totalObjetivos}</b> objetivos</span>` +
-      `<span><b>${resumen.totalCompromisos}</b> compromisos</span>`;
+    function formatearHora(
+        fecha
+    ) {
 
-    card.append(header, parts, stats);
-    return card;
-  }
+        if (!fecha) {
 
-  function render() {
-    const historial = loadData(HISTORIAL_KEY, []);
+            return "";
 
-    if (historial.length === 0) {
-      list.innerHTML = `<p class="historial__empty">Aún no hay reuniones guardadas.</p>`;
-      return;
+        }
+
+
+        const d =
+            new Date(
+                fecha
+            );
+
+
+        if (
+            Number.isNaN(
+                d.getTime()
+            )
+        ) {
+
+            return "";
+
+        }
+
+
+        return d.toLocaleTimeString(
+            "es-MX",
+            {
+                hour:
+                    "numeric",
+
+                minute:
+                    "2-digit",
+
+                hour12:
+                    true
+
+            }
+        );
+
     }
 
-    const ordenado = [...historial].sort(
-      (a, b) => new Date(b.meta.fecha) - new Date(a.meta.fecha)
+
+    /* =========================================================
+       OBTENER REUNIONES PROGRAMADAS
+       ========================================================= */
+
+    async function obtenerReunionesProgramadas() {
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/reuniones/programadas`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    data.mensaje ||
+                    data.error ||
+                    "No fue posible obtener las reuniones programadas."
+                );
+
+            }
+
+
+            return (
+                data.reuniones ||
+                []
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR OBTENIENDO REUNIONES PROGRAMADAS:",
+                error
+            );
+
+
+            return [];
+
+        }
+
+    }
+
+
+    /* =========================================================
+       OBTENER HISTORIAL
+       ========================================================= */
+
+    async function obtenerHistorial() {
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/reuniones/historial`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    data.mensaje ||
+                    data.error ||
+                    "No fue posible obtener el historial."
+                );
+
+            }
+
+
+            return (
+                data.reuniones ||
+                []
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR OBTENIENDO HISTORIAL:",
+                error
+            );
+
+
+            return [];
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CARD - REUNIÓN PROGRAMADA
+       ========================================================= */
+
+    function crearTarjetaProgramada(
+        reunion
+    ) {
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+
+        card.classList.add(
+            "history-card",
+            "history-card--programada"
+        );
+
+
+        /*
+         * ID REAL DE MYSQL
+         */
+
+        card.dataset.id =
+            reunion.ReunionId;
+
+
+        /* ---------------------------------------------
+           HEADER
+           --------------------------------------------- */
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.classList.add(
+            "history-card__header"
+        );
+
+
+        const fecha =
+            document.createElement(
+                "span"
+            );
+
+
+        fecha.classList.add(
+            "history-card__date"
+        );
+
+
+        fecha.textContent =
+            formatearFecha(
+                reunion.FechaInicio
+            );
+
+
+        const badge =
+            document.createElement(
+                "span"
+            );
+
+
+        badge.classList.add(
+            "history-card__badge",
+            "history-card__badge--programada"
+        );
+
+
+        badge.textContent =
+            "Programada";
+
+
+        header.append(
+            fecha,
+            badge
+        );
+
+
+        /* ---------------------------------------------
+           TÍTULO
+           --------------------------------------------- */
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+
+        title.classList.add(
+            "history-card__title"
+        );
+
+
+        title.textContent =
+            reunion.Titulo ||
+            "Reunión Flow";
+
+
+        /* ---------------------------------------------
+           HORA
+           --------------------------------------------- */
+
+        const hora =
+            document.createElement(
+                "div"
+            );
+
+
+        hora.classList.add(
+            "history-card__time"
+        );
+
+
+        hora.textContent =
+            formatearHora(
+                reunion.FechaInicio
+            );
+
+
+        /* ---------------------------------------------
+           PARTICIPANTES
+           --------------------------------------------- */
+
+        const parts =
+            document.createElement(
+                "div"
+            );
+
+
+        parts.classList.add(
+            "history-card__parts"
+        );
+
+
+        const numParticipantes =
+            Number(
+                reunion.TotalParticipantes
+            ) || 0;
+
+
+        parts.textContent =
+            `${numParticipantes} participante${
+                numParticipantes !== 1
+                    ? "s"
+                    : ""
+            }`;
+
+
+        /* ---------------------------------------------
+           ACCIÓN
+           --------------------------------------------- */
+
+        const action =
+            document.createElement(
+                "div"
+            );
+
+
+        action.classList.add(
+            "history-card__action"
+        );
+
+
+        action.textContent =
+            "Clic para iniciar →";
+
+
+        /* ---------------------------------------------
+           ARMAR CARD
+           --------------------------------------------- */
+
+        card.append(
+            header,
+            title,
+            hora,
+            parts,
+            action
+        );
+
+
+        return card;
+
+    }
+
+
+    /* =========================================================
+       CARD - HISTORIAL
+       ========================================================= */
+
+    function crearTarjetaHistorial(
+        reunion
+    ) {
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+
+        card.classList.add(
+            "history-card"
+        );
+
+
+        /*
+         * IMPORTANTE:
+         * usamos ReunionId.
+         * Ya no usamos índice de localStorage.
+         */
+
+        card.dataset.reunionId =
+            reunion.ReunionId;
+
+
+        /* ---------------------------------------------
+           HEADER
+           --------------------------------------------- */
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.classList.add(
+            "history-card__header"
+        );
+
+
+        const fecha =
+            document.createElement(
+                "span"
+            );
+
+
+        fecha.classList.add(
+            "history-card__date"
+        );
+
+
+        fecha.textContent =
+            formatearFecha(
+                reunion.FechaInicio
+            );
+
+
+        /* ---------------------------------------------
+           ESTADO
+           --------------------------------------------- */
+
+        const badge =
+            document.createElement(
+                "span"
+            );
+
+
+        badge.classList.add(
+            "history-card__badge"
+        );
+
+
+        const totalObjetivos =
+            Number(
+                reunion.TotalObjetivos
+            ) || 0;
+
+
+        const totalCompromisos =
+            Number(
+                reunion.TotalCompromisos
+            ) || 0;
+
+
+        const pendientes =
+            totalObjetivos +
+            totalCompromisos;
+
+
+        if (
+            reunion.Estado ===
+            "Finalizada"
+        ) {
+
+            badge.classList.add(
+                "history-card__badge--cerrada"
+            );
+
+
+            if (
+                pendientes === 0
+            ) {
+
+                badge.textContent =
+                    "Todo cerrado";
+
+            }
+            else {
+
+                badge.textContent =
+                    `${pendientes} pendientes`;
+
+            }
+
+        }
+        else {
+
+            badge.classList.add(
+                "history-card__badge--pendiente"
+            );
+
+
+            badge.textContent =
+                `${pendientes} pendientes`;
+
+        }
+
+
+        header.append(
+            fecha,
+            badge
+        );
+
+
+        /* ---------------------------------------------
+           TÍTULO
+           --------------------------------------------- */
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+
+        title.classList.add(
+            "history-card__title"
+        );
+
+
+        title.textContent =
+            reunion.Titulo ||
+            "Reunión Flow";
+
+
+        /* ---------------------------------------------
+           PARTICIPANTES
+           --------------------------------------------- */
+
+        const parts =
+            document.createElement(
+                "div"
+            );
+
+
+        parts.classList.add(
+            "history-card__parts"
+        );
+
+
+        const totalParticipantes =
+            Number(
+                reunion.TotalParticipantes
+            ) || 0;
+
+
+        parts.textContent =
+            `${totalParticipantes} participante${
+                totalParticipantes !== 1
+                    ? "s"
+                    : ""
+            }`;
+
+
+        /* ---------------------------------------------
+           ESTADÍSTICAS
+           --------------------------------------------- */
+
+        const stats =
+            document.createElement(
+                "div"
+            );
+
+
+        stats.classList.add(
+            "history-card__stats"
+        );
+
+
+        const objetivos =
+            document.createElement(
+                "span"
+            );
+
+
+        objetivos.innerHTML =
+            `<b>${totalObjetivos}</b> objetivos`;
+
+
+        const compromisos =
+            document.createElement(
+                "span"
+            );
+
+
+        compromisos.innerHTML =
+            `<b>${totalCompromisos}</b> compromisos`;
+
+
+        stats.append(
+            objetivos,
+            compromisos
+        );
+
+
+        /* ---------------------------------------------
+           ARMAR CARD
+           --------------------------------------------- */
+
+        card.append(
+            header,
+            title,
+            parts,
+            stats
+        );
+
+
+        return card;
+
+    }
+
+
+    /* =========================================================
+       CREAR SECCIÓN
+       ========================================================= */
+
+    function crearSeccion(
+        tituloTexto,
+        clase,
+        tarjetas
+    ) {
+
+        const section =
+            document.createElement(
+                "section"
+            );
+
+
+        section.classList.add(
+            "history-view__section",
+            clase
+        );
+
+
+        /* ---------------------------------------------
+           TÍTULO
+           --------------------------------------------- */
+
+        const titulo =
+            document.createElement(
+                "h2"
+            );
+
+
+        titulo.classList.add(
+            "history-view__section-title"
+        );
+
+
+        titulo.textContent =
+            tituloTexto;
+
+
+        /* ---------------------------------------------
+           CONTENEDOR DE TARJETAS
+           --------------------------------------------- */
+
+        const tarjetasContainer =
+            document.createElement(
+                "div"
+            );
+
+
+        if (
+            clase ===
+            "history-view__section--programadas"
+        ) {
+
+            tarjetasContainer.classList.add(
+                "history-view__programadas"
+            );
+
+        }
+        else {
+
+            tarjetasContainer.classList.add(
+                "history-view__historial"
+            );
+
+        }
+
+
+        tarjetasContainer.append(
+            ...tarjetas
+        );
+
+
+        section.append(
+            titulo,
+            tarjetasContainer
+        );
+
+
+        return section;
+
+    }
+
+
+    /* =========================================================
+       RENDER
+       ========================================================= */
+
+    async function render() {
+
+        let historial =
+            [];
+
+
+        let programadas =
+            [];
+
+
+        /* ---------------------------------------------
+           HISTORIAL
+           --------------------------------------------- */
+
+        historial =
+            await obtenerHistorial();
+
+
+        /* ---------------------------------------------
+           PROGRAMADAS
+           --------------------------------------------- */
+
+        programadas =
+            await obtenerReunionesProgramadas();
+
+
+        /* ---------------------------------------------
+           LIMPIAR
+           --------------------------------------------- */
+
+        list.replaceChildren();
+
+
+        /* =================================================
+           LAYOUT
+           ================================================= */
+
+        const layout =
+            document.createElement(
+                "div"
+            );
+
+
+        layout.classList.add(
+            "history-view__layout"
+        );
+
+
+        /* =================================================
+           PROGRAMADAS
+           ================================================= */
+
+        if (
+            programadas.length > 0
+        ) {
+
+            const tarjetasProgramadas =
+                [...programadas]
+                    .sort(
+                        (a, b) =>
+                            new Date(
+                                a.FechaInicio
+                            ) -
+                            new Date(
+                                b.FechaInicio
+                            )
+                    )
+                    .map(
+                        crearTarjetaProgramada
+                    );
+
+
+            layout.appendChild(
+                crearSeccion(
+                    "Próximas reuniones",
+                    "history-view__section--programadas",
+                    tarjetasProgramadas
+                )
+            );
+
+        }
+
+
+        /* =================================================
+           HISTORIAL
+           ================================================= */
+
+        if (
+            historial.length > 0
+        ) {
+
+            const tarjetasHistorial =
+                [...historial]
+                    .sort(
+                        (a, b) =>
+                            new Date(
+                                b.FechaInicio
+                            ) -
+                            new Date(
+                                a.FechaInicio
+                            )
+                    )
+                    .map(
+                        crearTarjetaHistorial
+                    );
+
+
+            layout.appendChild(
+                crearSeccion(
+                    "Historial de reuniones",
+                    "history-view__section--historial",
+                    tarjetasHistorial
+                )
+            );
+
+        }
+
+
+        /* =================================================
+           INSERTAR
+           ================================================= */
+
+        if (
+            layout.children.length > 0
+        ) {
+
+            list.appendChild(
+                layout
+            );
+
+        }
+        else {
+
+            const empty =
+                document.createElement(
+                    "p"
+                );
+
+
+            empty.classList.add(
+                "historial__empty"
+            );
+
+
+            empty.textContent =
+                "Aún no hay reuniones guardadas.";
+
+
+            list.appendChild(
+                empty
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CLICK
+       ========================================================= */
+
+    list.addEventListener(
+        "click",
+        (event) => {
+
+            /* ---------------------------------------------
+               REUNIÓN PROGRAMADA
+               --------------------------------------------- */
+
+            const programada =
+                event.target.closest(
+                    ".history-card--programada"
+                );
+
+
+            if (
+                programada
+            ) {
+
+                const id =
+                    Number(
+                        programada.dataset.id
+                    );
+
+
+                if (!id) {
+
+                    return;
+
+                }
+
+
+                document.dispatchEvent(
+                    new CustomEvent(
+                        "flow:iniciar-reunion",
+                        {
+                            detail: {
+                                id:
+                                    id
+                            }
+                        }
+                    )
+                );
+
+
+                return;
+
+            }
+
+
+            /* ---------------------------------------------
+               HISTORIAL
+               --------------------------------------------- */
+
+            const card =
+                event.target.closest(
+                    ".history-card"
+                );
+
+
+            if (!card) {
+
+                return;
+
+            }
+
+
+            if (
+                card.classList.contains(
+                    "history-card--programada"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            const reunionId =
+                Number(
+                    card.dataset.reunionId
+                );
+
+
+            if (!reunionId) {
+
+                return;
+
+            }
+
+
+            if (
+                typeof onOpen ===
+                "function"
+            ) {
+
+                onOpen(
+                    reunionId
+                );
+
+            }
+
+        }
     );
 
-    const tarjetas = ordenado.map((reunion) => {
-      const indexReal = historial.indexOf(reunion);
-      return crearTarjeta(reunion, indexReal);
-    });
 
-    list.replaceChildren(...tarjetas);
-  }
+    /* =========================================================
+       EVENTOS
+       ========================================================= */
 
-  list.addEventListener("click", (event) => {
-    const card = event.target.closest(".history-card");
-    if (!card) return;
-    onOpen(Number(card.dataset.index));
-  });
+    document.addEventListener(
+        "flow:reunion-programada",
+        () => {
 
-  return { render };
+            render();
+
+        }
+    );
+
+
+    /* =========================================================
+       API PÚBLICA
+       ========================================================= */
+
+    return {
+
+        render
+
+    };
+
 }

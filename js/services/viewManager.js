@@ -1,11 +1,88 @@
 const vistas = {
-  historial: document.querySelector("#vista-historial"),
-  reunion: document.querySelector("#vista-reunion"),
-  archivo: document.querySelector("#vista-archivo"),
+
+    dashboard:
+        document.querySelector("#vista-dashboard"),
+
+    historial:
+        document.querySelector("#vista-historial"),
+
+    usuarios:
+        document.querySelector("#vista-usuarios"),
+
+    registroUsuario:
+        document.querySelector("#vista-registro-usuario"),
+
+    editarUsuario:
+        document.querySelector("#vista-editar-usuario"),
+
+    reunion:
+        document.querySelector("#vista-reunion"),
+
+    compromisos:
+        document.querySelector("#vista-compromisos"),
+
+    archivo:
+        document.querySelector("#vista-archivo")
+
 };
 
+
+/**
+ * Muestra una vista y oculta todas las demás.
+ *
+ * Vistas disponibles:
+ *
+ * dashboard
+ * historial
+ * usuarios
+ * registroUsuario
+ * editarUsuario
+ * reunion
+ * compromisos
+ * archivo
+ */
 export function showView(nombre) {
-  for (const clave in vistas) {
-    vistas[clave].classList.toggle("view--hidden", clave !== nombre);
-  }
+
+    for (const clave in vistas) {
+
+        const vista = vistas[clave];
+
+        if (!vista) {
+            continue;
+        }
+
+        vista.classList.toggle(
+            "view--hidden",
+            clave !== nombre
+        );
+
+    }
+
+}
+
+
+/**
+ * Regresa el nombre de la vista actualmente visible.
+ */
+export function getCurrentView() {
+
+    for (const clave in vistas) {
+
+        const vista = vistas[clave];
+
+        if (
+            vista &&
+            !vista.classList.contains(
+                "view--hidden"
+            )
+        ) {
+
+            return clave;
+
+        }
+
+    }
+
+    return null;
+
 }
