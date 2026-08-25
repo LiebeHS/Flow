@@ -1,246 +1,2028 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet"  href="css/main.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/main.css"
+    >
+
     <title>Flow - Juntas semanales</title>
-    <link rel="icon" href="assets/flowlogo.PNG" type="image/x-icon">
+
+    <link
+        rel="icon"
+        href="assets/flowlogo.PNG"
+        type="image/x-icon"
+    >
+
 </head>
+
+
 <body>
 
-    <!-- Encabezdo global de Flow-->
-     <header class="app-header">
+    <!-- =========================================================
+         ENCABEZADO GLOBAL
+         ========================================================= -->
+
+    <header class="app-header">
+
         <div class="app-header__inner">
-          <span class="app-header__brand"></span>
-          <img class="app-header__logo" src="assets/flowtext.PNG" alt="Logo de Flow" >
+
+            <span class="app-header__brand"></span>
+
+            <img
+                class="app-header__logo"
+                src="assets/flowtext.PNG"
+                alt="Logo de Flow"
+            >
+
         </div>
+
+
         <div class="app-header__actions">
-          <div class="timer" id="timer">
-            <span class="timer__value">--:--</span>
-          </div>
-          <button type="button" class="app-header__btn" id="btn-iniciar">Iniciar reunión</button>
-          <button type="button" class="app-header__btn" id="btn-pausar" disabled>Pausar</button>
-          <button type="button" class="app-header__btn app-header__btn--danger" id="btn-terminar" disabled>Terminar</button>
+
+            <div
+                class="timer"
+                id="timer"
+            >
+
+                <span class="timer__value">
+                    --:--
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="app-header__btn"
+                id="btn-pausar"
+                disabled
+            >
+                Pausar
+            </button>
+
+            <button
+                type="button"
+                class="app-header__btn app-header__btn--danger"
+                id="btn-terminar"
+                disabled
+            >
+                Terminar
+            </button>
+
+            <button
+                type="button"
+                id="btn-cerrar-sesion"
+                class="app-header__logout"
+            >
+                Cerrar sesión
+            </button>
+
         </div>
-     </header>
 
-     <!--Contenido principal: el detalle de UNA reunión-->
-     <main class="meeting">
+    </header>
 
-        <div id="vista-historial" class="view">
-          <h1 class="view__title">Reuniones</h1>
-          <div class="historial__list">
-            <!-- Aquí irán las tarjetas de reuniones pasadas (Fase 4) -->
-            <p class="historial__empty">Aún no hay reuniones guardadas.</p>
-          </div>
+
+    <!-- =========================================================
+         CONTENIDO PRINCIPAL
+         ========================================================= -->
+
+    <main class="meeting">
+
+
+        <!-- =====================================================
+             DASHBOARD
+             ===================================================== -->
+
+        <section
+            id="vista-dashboard"
+            class="view"
+        >
+
+            <div class="dashboard">
+
+                <header class="dashboard__header">
+
+                    <h1 class="dashboard__title">
+                        Bienvenido a Flow
+                        <span id="usuario-nombre"></span>
+                    </h1>
+
+                    <p class="dashboard__subtitle">
+                        Gestión de reuniones y seguimiento de compromisos
+                    </p>
+
+                </header>
+
+
+                <div class="dashboard__grid">
+
+
+                    <!-- =========================================
+                         HISTORIAL
+                         ========================================= -->
+
+                    <button
+                        type="button"
+                        class="dashboard-card dashboard-card--history"
+                        data-view="historial"
+                    >
+
+                        <span class="dashboard-card__icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <rect
+                                    x="3"
+                                    y="4"
+                                    width="18"
+                                    height="17"
+                                    rx="2"
+                                ></rect>
+
+                                <line
+                                    x1="8"
+                                    y1="2"
+                                    x2="8"
+                                    y2="6"
+                                ></line>
+
+                                <line
+                                    x1="16"
+                                    y1="2"
+                                    x2="16"
+                                    y2="6"
+                                ></line>
+
+                                <line
+                                    x1="3"
+                                    y1="9"
+                                    x2="21"
+                                    y2="9"
+                                ></line>
+
+                                <line
+                                    x1="8"
+                                    y1="13"
+                                    x2="16"
+                                    y2="13"
+                                ></line>
+
+                                <line
+                                    x1="8"
+                                    y1="17"
+                                    x2="13"
+                                    y2="17"
+                                ></line>
+
+                            </svg>
+
+                        </span>
+
+
+                        <span class="dashboard-card__title">
+                            Historial de Reuniones
+                        </span>
+
+
+                        <span class="dashboard-card__description">
+                            Consulta reuniones anteriores y sus resultados.
+                        </span>
+
+                    </button>
+
+
+                    <!-- =========================================
+                         CONTROL DE USUARIOS
+                         ========================================= -->
+
+                    <button
+                        type="button"
+                        class="dashboard-card dashboard-card--users"
+                        data-view="usuarios"
+                    >
+
+                        <span class="dashboard-card__icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <circle
+                                    cx="9"
+                                    cy="8"
+                                    r="3"
+                                ></circle>
+
+                                <path
+                                    d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"
+                                ></path>
+
+                                <path
+                                    d="M16 11c2.2 0 4 1.8 4 4"
+                                ></path>
+
+                                <path
+                                    d="M17 20h4"
+                                ></path>
+
+                            </svg>
+
+                        </span>
+
+
+                        <span class="dashboard-card__title">
+                            Control de Usuarios
+                        </span>
+
+
+                        <span class="dashboard-card__description">
+                            Administra los usuarios y accesos de Flow.
+                        </span>
+
+                    </button>
+
+
+                    <!-- =========================================
+                         PROGRAMAR REUNIÓN
+                         ========================================= -->
+
+                    <button
+                        type="button"
+                        class="dashboard-card dashboard-card--primary"
+                        id="dashboard-iniciar-reunion"
+                    >
+
+                        <span class="dashboard-card__icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="9"
+                                ></circle>
+
+                                <polygon
+                                    points="10,8 16,12 10,16"
+                                ></polygon>
+
+                            </svg>
+
+                        </span>
+
+
+                        <span class="dashboard-card__title">
+                            Programar Reunión
+                        </span>
+
+
+                        <span class="dashboard-card__description">
+                            Programa una nueva reunión semanal.
+                        </span>
+
+                    </button>
+
+
+                    <!-- =========================================
+                         COMPROMISOS
+                         ========================================= -->
+
+                    <button
+                        type="button"
+                        class="dashboard-card dashboard-card--commitments"
+                        data-view="compromisos"
+                    >
+
+                        <span class="dashboard-card__icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <rect
+                                    x="4"
+                                    y="3"
+                                    width="16"
+                                    height="18"
+                                    rx="2"
+                                ></rect>
+
+                                <line
+                                    x1="8"
+                                    y1="7"
+                                    x2="16"
+                                    y2="7"
+                                ></line>
+
+                                <polyline
+                                    points="8,12 10,14 14,10"
+                                ></polyline>
+
+                                <line
+                                    x1="8"
+                                    y1="17"
+                                    x2="16"
+                                    y2="17"
+                                ></line>
+
+                            </svg>
+
+                        </span>
+
+
+                        <span class="dashboard-card__title">
+                            Compromisos
+                        </span>
+
+
+                        <span class="dashboard-card__description">
+                            Consulta y da seguimiento a los compromisos.
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             HISTORIAL DE REUNIONES
+             ===================================================== -->
+
+        <section
+            id="vista-historial"
+            class="view view--hidden"
+        >
+
+            <div class="view__navigation">
+
+                <button
+                    type="button"
+                    class="view__back"
+                    data-view="dashboard"
+                >
+                    ← Volver al inicio
+                </button>
+
+            </div>
+
+    <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+
+    <header class="history-view__header">
+
+        <div class="history-view__heading">
+
+            <h1 class="view__title">
+                Reuniones
+            </h1>
+
         </div>
-        <!-- ===== VISTA REUNIÓN (oculta al entrar) ===== -->
-        <div id="vista-reunion" class="view view--hidden">
-
-          <header class="meeting__header" >
-             <h1 class="meeting__title">Reunión Semanal</h1>
-
-          <dl class="meeting__meta">
-            <div class="meeting__meta-row">
-              <dt class="meeting__meta-label">Fecha</dt>
-              <dd class="meeting__meta-value" data-campo="fecha">-</dd>
-            </div>
-            <div class="meeting__meta-row">
-              <dt class="meeting__meta-label">Estado</dt>
-              <dd class="meeting__meta-value" data-campo="estado">-</dd>
-            </div>
-            <div class="meeting__meta-row">
-              <dt class="meeting__meta-label">Miembros</dt>
-              <dd class="meeting__meta-value" data-campo="miembros">-</dd>
-            </div>
-          </dl>
-          
-        </header>
-
-        <div class="meeting__body" id="meeting__body">
-          <div class="pause-overlay" id="pause-overlay">           
-            <span class="pause-overlay__text">Reunión en pausa</span>
-            </div>
-        <section class="meeting-section" id="objetivos" aria-labelledby="objetivos-title">
-            <h2 id="objetivos-title">Objetivos de la reunión</h2>
-            <p class="editable-list__counter"></p>
-
-            <ul class="editable-list__list"></ul>
-            
-
-            <div class="editable-list__form">
-                <input type="text" class="editable-list__input" placeholder="Nuevo objetivo..." aria-label="Escribe aqui tu objetivo" > 
-                <button type="button" class="editable-list__add">Agregar</button>
-
-            </div>
-        </section>
 
 
-        <section class="meeting-section" id="asuntos" aria-labelledby="asuntos-title">
-            <h2 id="asuntos-title">Asuntos generales</h2>
-            <p class="editable-list__counter"></p>
+        <button
+            type="button"
+            id="btn-programar-reunion-historial"
+            class="history-view__add"
+        >
+            + Programar reunión
+        </button>
 
-            <ul class="editable-list__list" ></ul>
-
-            <div class="editable-list__form">
-                <input type="text" class="editable-list__input" placeholder="Nuevo asunto..." aria-label="Escribe tu asunto" >
-                <button type="button" class="editable-list__add">Agregar</button> 
-            </div>
-        </section>
+    </header>
 
 
-        <!--AQUI ES DONDE MÁS ENFÁSIS SE DEBERÁ PONER, YA QUE ES EN DONDE MÁS TIEMPO SE TOMA EN LAS REUNIONES-->
-         <section class="meeting-section" id="desarrollo" aria-labelledby="desarrollo-title">
-            <h2 id="desarrollo-title">Desarrollo de la reunión</h2>
-            <div class="development__table" ></div>
-        </section>
+    <div class="historial__list">
 
-         <section class="meeting-section" id="compromisos" aria-labelledby="compromisos-title">
-  <h2 id="compromisos-title">Compromisos</h2>
+        <p class="historial__empty">
+            Aún no hay reuniones guardadas.
+        </p>
 
-  <ul class="commitment-list__list"></ul>
+    </div>
 
-  <button type="button" class="commitment-list__add">+ Nuevo compromiso</button>
-
-  <dialog class="commitment-list__dialog">
-    <form class="commitment-list__form">
-      <h3 class="commitment-list__form-title">Nuevo compromiso</h3>
-
-      <label class="field">
-        <span class="field__label">Colaboradores</span>
-        <input type="text" name="colaboradores" class="field__input"
-               placeholder="Ana, Luis, María" required>
-      </label>
-
-      <label class="field">
-        <span class="field__label">Descripción</span>
-        <input type="text" name="descripcion" class="field__input" required>
-      </label>
-
-      <div class="field-row">
-        <label class="field">
-          <span class="field__label">Fecha de inicio</span>
-          <input type="date" name="fechaInicio" class="field__input">
-        </label>
-        <label class="field">
-          <span class="field__label">Fecha límite</span>
-          <input type="date" name="fechaLimite" class="field__input">
-        </label>
-      </div>
-
-      <div class="field-row">
-        <label class="field">
-          <span class="field__label">Estado</span>
-          <select name="estado" class="field__input">
-            <option value="pendiente">Pendiente</option>
-            <option value="en-progreso">En progreso</option>
-            <option value="completado">Completado</option>
-          </select>
-        </label>
-        <label class="field">
-          <span class="field__label">Prioridad</span>
-          <select name="prioridad" class="field__input">
-            <option value="alta">Alta</option>
-            <option value="media">Media</option>
-            <option value="baja">Baja</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="commitment-list__form-actions">
-        <button type="button" class="commitment-list__cancel">Cancelar</button>
-        <button type="submit" class="commitment-list__save">Guardar</button>
-      </div>
-    </form>
-  </dialog>
 </section>
 
-         <section class="meeting-section" id="otros" aria-labelledby="otros-title">
-            <h2 id="otros-title">Otros Asuntos</h2>
-            <div class="text-section"></div>
-        </section>
 
-        <section class="meeting-section" id="competitividad" aria-labelledby="competitividad-title">
-            <h2 id="competitividad-title">Competitividad</h2>
-            <div class="text-section"></div>
-        </section>
+<!-- =====================================================
+     CONTROL DE USUARIOS
+     ===================================================== -->
 
-        <section class="meeting-section" id="acuerdos" aria-labelledby="acuerdos-title">
-            <h2 id="acuerdos-title">Acuerdos</h2>
-            <div class="text-section"></div>
-        </section>
+<section
+    id="vista-usuarios"
+    class="view view--hidden"
+>
 
-       <section class="meeting-section" id="enlaces" aria-labelledby="enlaces-title">
-        <h2 id="enlaces-title">Enlaces</h2>
+    <!-- =================================================
+         NAVEGACIÓN
+         ================================================= -->
 
-        <ul class="link-list__list"></ul>
+    <div class="view__navigation">
 
-        <div class="link-list__form" >
-          <input type="text" class="link-list__title" placeholder="Titulo del enlace" aria-label="Titulo del enlace">
-          <input type="url" class="link-list__url" placeholder="https://..." aria-label="URL del enlace">
-          <button type="button" class="link-list__add"> Agregar </button>
-        </div>
-        </section> 
+        <button
+            type="button"
+            class="view__back"
+            data-view="dashboard"
+        >
+            ← Volver al inicio
+        </button>
 
-        <section class="meeting-section" id="reflexion" aria-labelledby="reflexion-title">
-            <h2 id="reflexion-title">Reflexión Grupal</h2>
-            <div class="text-section" ></div>
-        </section>
-        
-        </div>
-        </div>
-
-      <div id="vista-archivo" class="view view--hidden">
-        <div class="archive__banner">
-          <button type="button" class="archive__back" id="archive-back">← Volver al historial</button>
-          <span class="archive__label">Reunión archivada · solo lectura</span>
-        </div>
-        <div class="archive__content" id="archive-content"></div>
-      </div>  
-
-     </main>
-
-      <dialog class="confirm-dialog">
-       <p class="confirm-dialog__message"></p>
-       <div class="confirm-dialog__actions">
-         <button type="button" class="confirm-dialog__cancel">Cancelar</button>
-         <button type="button" class="confirm-dialog__accept">Aceptar</button>
-       </div>
-     </dialog>
-
-     <dialog class="start-dialog">
-  <form class="start-dialog__form">
-    <h3 class="start-dialog__title">Iniciar reunión</h3>
-
-    <div class="field">
-      <span class="field__label">Fecha</span>
-      <span class="start-dialog__date"></span>
     </div>
 
-    <div class="field">
-      <span class="field__label">Participantes</span>
-      <div class="chips" id="chips-participantes"></div>
-      <input type="text" class="field__input" id="input-participante"
-             placeholder="Escribe un nombre y presiona Enter">
-      <span class="start-dialog__aviso" id="aviso-participantes">Se necesitan al menos 2 participantes para iniciar una reunión</span>
+
+    <!-- =================================================
+         CONTENEDOR PRINCIPAL
+         ================================================= -->
+
+    <section class="users-view">
+
+
+        <!-- =================================================
+             ENCABEZADO
+             ================================================= -->
+
+        <header class="users-view__header">
+
+            <div class="users-view__heading">
+
+                <h1 class="view__title">
+                    Control de Usuarios
+                </h1>
+
+                <p class="users-view__subtitle">
+                    Administración de usuarios de Flow
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="btn-nuevo-usuario"
+                class="users-view__add"
+                data-view="registroUsuario"
+            >
+                + Nuevo usuario
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+             CONTENIDO
+             ================================================= -->
+
+        <section class="users-view__content">
+
+            <!-- =====================================================
+     FILTROS DE USUARIOS
+     ===================================================== -->
+
+<div class="users-filters">
+
+    <div class="users-filter">
+
+        <label for="filtro-departamento">
+            Departamento
+        </label>
+
+        <select
+            id="filtro-departamento"
+            class="users-filter__select"
+        >
+
+            <option value="">
+                Todos los departamentos
+            </option>
+
+        </select>
+
     </div>
 
-    <div class="field">
-      <span class="field__label">Duración (minutos)</span>
-      <input type="number" class="field__input" id="input-duracion" value="60" min="1">
+
+    <div class="users-filter">
+
+        <label for="filtro-area">
+            Área
+        </label>
+
+        <select
+            id="filtro-area"
+            class="users-filter__select"
+            disabled
+        >
+
+            <option value="">
+                Todas las áreas
+            </option>
+
+        </select>
+
     </div>
 
-    <div class="start-dialog__actions">
-      <button type="button" class="start-dialog__cancel">Cancelar</button>
-      <button type="submit" class="start-dialog__confirm">Iniciar</button>
-    </div>
-  </form>
-</dialog>
+
+    <button
+        type="button"
+        id="btn-limpiar-filtros"
+        class="users-filter__clear"
+    >
+        Limpiar filtros
+    </button>
+
 </div>
 
-          <script type="module" src="js/main.js"></script> <!--Vinculación del JS-->  
+
+            <!-- =============================================
+                 TABLA DE USUARIOS
+                 ============================================= -->
+
+            <div
+                id="usuarios-tabla-contenedor"
+                class="users-table-container"
+            >
+
+                <table
+                    class="users-table"
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Nombre
+                            </th>
+
+                            <th>
+                                Departamento
+                            </th>
+
+                            <th>
+                                Área
+                            </th>
+
+                            <th>
+                                Correo electrónico
+                            </th>
+
+                            <th>
+                                Estado
+                            </th>
+
+                            <th>
+                                Acción
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="usuarios-tabla-body"
+                    >
+
+                        <!--
+                            Los usuarios serán cargados
+                            dinámicamente desde MySQL.
+                        -->
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- =========================================
+                     SIN USUARIOS
+                     ========================================= -->
+
+                <div
+                    id="usuarios-empty"
+                    class="users-view__empty"
+                    hidden
+                >
+
+                    <div
+                        class="users-view__empty-icon"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <path
+                                d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                            />
+
+                            <circle
+                                cx="9"
+                                cy="7"
+                                r="4"
+                            />
+
+                            <path
+                                d="M22 21v-2a4 4 0 0 0-3-3.87"
+                            />
+
+                            <path
+                                d="M16 3.13a4 4 0 0 1 0 7.75"
+                            />
+
+                        </svg>
+
+                    </div>
+
+
+                    <h2>
+                        No hay usuarios registrados
+                    </h2>
+
+
+                    <p>
+                        Actualmente no existen usuarios registrados
+                        en el sistema.
+                    </p>
+
+                </div>
+
+
+                <!-- =========================================
+                     CARGANDO
+                     ========================================= -->
+
+                <div
+                    id="usuarios-loading"
+                    class="users-table__loading"
+                    hidden
+                >
+
+                    Cargando usuarios...
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </section>
+
+</section>
+
+<!-- =====================================================
+     EDITAR USUARIO
+     ===================================================== -->
+
+<section
+    id="vista-editar-usuario"
+    class="view view--hidden"
+>
+
+    <div class="view__navigation">
+
+        <button
+            type="button"
+            class="view__back"
+            data-view="usuarios"
+        >
+            ← Volver a usuarios
+        </button>
+
+    </div>
+
+
+    <section class="edit-user-view">
+
+        <header class="edit-user-view__header">
+
+            <h1 class="view__title">
+                Editar usuario
+            </h1>
+
+            <p class="edit-user-view__subtitle">
+                Actualiza la información del usuario
+            </p>
+
+        </header>
+
+
+        <form
+            id="editar-usuario-form"
+            class="edit-user-form"
+        >
+
+            <input
+                type="hidden"
+                id="editar-usuario-id"
+            >
+
+
+            <!-- NOMBRE -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-nombre">
+                    Nombre completo
+                </label>
+
+                <input
+                    type="text"
+                    id="editar-nombre"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DEPARTAMENTO -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-departamento">
+                    Departamento
+                </label>
+
+                <select
+                    id="editar-departamento"
+                    required
+                >
+
+                    <option value="">
+                        Cargando departamentos...
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ÁREA -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-area">
+                    Área
+                </label>
+
+                <select
+                    id="editar-area"
+                    required
+                    disabled
+                >
+
+                    <option value="">
+                        Seleccione un área
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- CORREO -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-correo">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="editar-correo"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CONTRASEÑA -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-password">
+                    Nueva contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="editar-password"
+                    placeholder="Dejar vacío para conservar la actual"
+                >
+
+                <small>
+                    Deja este campo vacío si no deseas cambiar la contraseña.
+                </small>
+
+            </div>
+
+
+            <!-- CONFIRMAR CONTRASEÑA -->
+
+            <div class="edit-user-form__group">
+
+                <label for="editar-password-confirmacion">
+                    Confirmar nueva contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="editar-password-confirmacion"
+                >
+
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="editar-usuario-error"
+                class="edit-user-form__error"
+                hidden
+            ></div>
+
+
+            <!-- BOTONES -->
+
+            <div class="edit-user-form__actions">
+
+                <button
+                    type="button"
+                    class="edit-user-form__cancel"
+                    data-view="usuarios"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    id="btn-guardar-usuario"
+                    class="edit-user-form__submit"
+                >
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</section>
+<!-- =====================================================
+     REGISTRO DE USUARIO
+     ===================================================== -->
+
+<section
+    id="vista-registro-usuario"
+    class="view view--hidden"
+>
+
+    <div class="view__navigation">
+
+        <button
+            type="button"
+            class="view__back"
+            data-view="usuarios"
+        >
+            ← Volver a Control de Usuarios
+        </button>
+
+    </div>
+
+
+    <section class="user-registration">
+
+        <header class="user-registration__header">
+
+            <h1 class="view__title">
+                Nuevo Usuario
+            </h1>
+
+            <p>
+                Registra un nuevo usuario para Flow
+            </p>
+
+        </header>
+
+
+        <form
+            id="form-registro-usuario"
+            class="user-registration__form"
+        >
+
+            <!-- =================================================
+                 NOMBRE
+                 ================================================= -->
+
+            <div class="user-registration__field">
+
+                <label for="usuario-nombre">
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    id="usuario-nombre"
+                    name="nombre"
+                    maxlength="150"
+                    autocomplete="name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- =================================================
+                 DEPARTAMENTO / ÁREA
+                 ================================================= -->
+
+            <div class="user-registration__row">
+
+                <div class="user-registration__field">
+
+                    <label for="usuario-departamento">
+                        Departamento
+                    </label>
+
+                    <select
+                        id="usuario-departamento"
+                        name="departamento"
+                        required
+                    >
+
+                        <option value="">
+                            Seleccione un departamento
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="user-registration__field">
+
+                    <label for="usuario-area">
+                        Área
+                    </label>
+
+                    <select
+                        id="usuario-area"
+                        name="area"
+                        required
+                        disabled
+                    >
+
+                        <option value="">
+                            Seleccione primero un departamento
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CORREO / CONTRASEÑA
+                 ================================================= -->
+
+            <div class="user-registration__row">
+
+                <div class="user-registration__field">
+
+                    <label for="usuario-correo">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        type="email"
+                        id="usuario-correo"
+                        name="correo_electronico"
+                        maxlength="150"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="user-registration__field">
+
+                    <label for="usuario-password">
+                        Contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        id="usuario-password"
+                        name="password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <small>
+                        Mínimo 8 caracteres.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MENSAJE
+                 ================================================= -->
+
+            <div
+                id="usuario-mensaje"
+                class="user-registration__message"
+                aria-live="polite"
+            ></div>
+
+
+            <!-- =================================================
+                 BOTONES
+                 ================================================= -->
+
+            <div class="user-registration__actions">
+
+                <button
+                    type="button"
+                    class="view__back"
+                    data-view="usuarios"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="btn-guardar-usuario"
+                    class="users-view__add"
+                >
+                    Registrar usuario
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</section>
+
+
+        <!-- =====================================================
+             VISTA DE REUNIÓN
+             ===================================================== -->
+
+        <section
+            id="vista-reunion"
+            class="view view--hidden"
+        >
+
+            <header class="meeting__header">
+
+                <h1 class="meeting__title">
+                    Reunión Semanal
+                </h1>
+
+
+                <dl class="meeting__meta">
+
+                    <div class="meeting__meta-row">
+
+                        <dt class="meeting__meta-label">
+                            Fecha
+                        </dt>
+
+                        <dd
+                            class="meeting__meta-value"
+                            data-campo="fecha"
+                        >
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div class="meeting__meta-row">
+
+                        <dt class="meeting__meta-label">
+                            Estado
+                        </dt>
+
+                        <dd
+                            class="meeting__meta-value"
+                            data-campo="estado"
+                        >
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div class="meeting__meta-row">
+
+                        <dt class="meeting__meta-label">
+                            Miembros
+                        </dt>
+
+                        <dd
+                            class="meeting__meta-value"
+                            data-campo="miembros"
+                        >
+                            -
+                        </dd>
+
+                    </div>
+
+                </dl>
+
+            </header>
+
+
+            <div
+                class="meeting__body"
+                id="meeting__body"
+            >
+
+                <div
+                    class="pause-overlay"
+                    id="pause-overlay"
+                >
+
+                    <span class="pause-overlay__text">
+                        Reunión en pausa
+                    </span>
+
+                </div>
+
+
+                <!-- =============================================
+                     OBJETIVOS
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="objetivos"
+                    aria-labelledby="objetivos-title"
+                >
+
+                    <h2 id="objetivos-title">
+                        Objetivos de la reunión
+                    </h2>
+
+                    <p class="editable-list__counter"></p>
+
+                    <ul class="editable-list__list"></ul>
+
+
+                    <div class="editable-list__form">
+
+                        <input
+                            type="text"
+                            class="editable-list__input"
+                            placeholder="Nuevo objetivo..."
+                            aria-label="Escribe aquí tu objetivo"
+                        >
+
+                        <button
+                            type="button"
+                            class="editable-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =============================================
+                     ASUNTOS GENERALES
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="asuntos"
+                    aria-labelledby="asuntos-title"
+                >
+
+                    <h2 id="asuntos-title">
+                        Asuntos generales
+                    </h2>
+
+                    <p class="editable-list__counter"></p>
+
+                    <ul class="editable-list__list"></ul>
+
+
+                    <div class="editable-list__form">
+
+                        <input
+                            type="text"
+                            class="editable-list__input"
+                            placeholder="Nuevo asunto..."
+                            aria-label="Escribe tu asunto"
+                        >
+
+                        <button
+                            type="button"
+                            class="editable-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =============================================
+                     DESARROLLO
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="desarrollo"
+                    aria-labelledby="desarrollo-title"
+                >
+
+                    <h2 id="desarrollo-title">
+                        Desarrollo de la reunión
+                    </h2>
+
+                    <div class="development__table"></div>
+
+                </section>
+
+
+                <!-- =============================================
+                     COMPROMISOS
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="compromisos"
+                    aria-labelledby="compromisos-title"
+                >
+
+                    <h2 id="compromisos-title">
+                        Compromisos
+                    </h2>
+
+                    <ul class="commitment-list__list"></ul>
+
+
+                    <button
+                        type="button"
+                        class="commitment-list__add"
+                    >
+                        + Nuevo compromiso
+                    </button>
+
+
+                    <dialog class="commitment-list__dialog">
+
+                        <form class="commitment-list__form">
+
+                            <h3 class="commitment-list__form-title">
+                                Nuevo compromiso
+                            </h3>
+
+
+                            <label class="field">
+
+                                <span class="field__label">
+                                    Colaboradores
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="colaboradores"
+                                    class="field__input"
+                                    placeholder="Ana, Luis, María"
+                                    required
+                                >
+
+                            </label>
+
+
+                            <label class="field">
+
+                                <span class="field__label">
+                                    Descripción
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="descripcion"
+                                    class="field__input"
+                                    required
+                                >
+
+                            </label>
+
+
+                            <div class="field-row">
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Fecha de inicio
+                                    </span>
+
+                                    <input
+                                        type="date"
+                                        name="fechaInicio"
+                                        class="field__input"
+                                    >
+
+                                </label>
+
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Fecha límite
+                                    </span>
+
+                                    <input
+                                        type="date"
+                                        name="fechaLimite"
+                                        class="field__input"
+                                    >
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="field-row">
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Estado
+                                    </span>
+
+                                    <select
+                                        name="estado"
+                                        class="field__input"
+                                    >
+
+                                        <option value="pendiente">
+                                            Pendiente
+                                        </option>
+
+                                        <option value="en-progreso">
+                                            En progreso
+                                        </option>
+
+                                        <option value="completado">
+                                            Completado
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Prioridad
+                                    </span>
+
+                                    <select
+                                        name="prioridad"
+                                        class="field__input"
+                                    >
+
+                                        <option value="alta">
+                                            Alta
+                                        </option>
+
+                                        <option value="media">
+                                            Media
+                                        </option>
+
+                                        <option value="baja">
+                                            Baja
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="commitment-list__form-actions">
+
+                                <button
+                                    type="button"
+                                    class="commitment-list__cancel"
+                                >
+                                    Cancelar
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="commitment-list__save"
+                                >
+                                    Guardar
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </dialog>
+
+                </section>
+
+
+                <!-- =============================================
+                     OTROS ASUNTOS
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="otros"
+                    aria-labelledby="otros-title"
+                >
+
+                    <h2 id="otros-title">
+                        Otros Asuntos
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <!-- =============================================
+                     COMPETITIVIDAD
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="competitividad"
+                    aria-labelledby="competitividad-title"
+                >
+
+                    <h2 id="competitividad-title">
+                        Competitividad
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <!-- =============================================
+                     ACUERDOS
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="acuerdos"
+                    aria-labelledby="acuerdos-title"
+                >
+
+                    <h2 id="acuerdos-title">
+                        Acuerdos
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <!-- =============================================
+                     ENLACES
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="enlaces"
+                    aria-labelledby="enlaces-title"
+                >
+
+                    <h2 id="enlaces-title">
+                        Enlaces
+                    </h2>
+
+                    <ul class="link-list__list"></ul>
+
+
+                    <div class="link-list__form">
+
+                        <input
+                            type="text"
+                            class="link-list__title"
+                            placeholder="Título del enlace"
+                            aria-label="Título del enlace"
+                        >
+
+                        <input
+                            type="url"
+                            class="link-list__url"
+                            placeholder="https://..."
+                            aria-label="URL del enlace"
+                        >
+
+                        <button
+                            type="button"
+                            class="link-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =============================================
+                     REFLEXIÓN
+                     ============================================= -->
+
+                <section
+                    class="meeting-section"
+                    id="reflexion"
+                    aria-labelledby="reflexion-title"
+                >
+
+                    <h2 id="reflexion-title">
+                        Reflexión Grupal
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VISTA GLOBAL DE COMPROMISOS
+             ===================================================== -->
+
+        <section
+            id="vista-compromisos"
+            class="view view--hidden"
+        >
+
+            <div class="view__navigation">
+
+                <button
+                    type="button"
+                    class="view__back"
+                    data-view="dashboard"
+                >
+                    ← Volver al inicio
+                </button>
+
+            </div>
+
+
+            <div class="commitments-view">
+
+                <header class="commitments-view__header">
+
+                    <div>
+
+                        <h1 class="view__title">
+                            Compromisos
+                        </h1>
+
+                        <p class="commitments-view__subtitle">
+                            Seguimiento de compromisos de las reuniones
+                        </p>
+
+                    </div>
+
+                </header>
+
+
+                <div class="commitments-view__content">
+
+                    <p>
+                        El módulo global de compromisos estará disponible
+                        próximamente.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VISTA DE ARCHIVO
+             ===================================================== -->
+
+        <section
+            id="vista-archivo"
+            class="view view--hidden"
+        >
+
+            <div class="archive__banner">
+
+                <button
+                    type="button"
+                    class="archive__back"
+                    id="archive-back"
+                >
+                    ← Volver al historial
+                </button>
+
+
+                <span class="archive__label">
+                    Reunión archivada · solo lectura
+                </span>
+
+            </div>
+
+
+            <div
+                class="archive__content"
+                id="archive-content"
+            ></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         DIÁLOGO DE CONFIRMACIÓN
+         ========================================================= -->
+
+    <dialog class="confirm-dialog">
+
+        <p class="confirm-dialog__message"></p>
+
+
+        <div class="confirm-dialog__actions">
+
+            <button
+                type="button"
+                class="confirm-dialog__cancel"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="confirm-dialog__accept"
+            >
+                Aceptar
+            </button>
+
+        </div>
+
+    </dialog>
+
+
+  <!-- =========================================================
+     DIÁLOGO PARA PROGRAMAR REUNIÓN
+     ========================================================= -->
+
+<dialog class="start-dialog">
+
+    <form class="start-dialog__form">
+
+        <!-- =================================================
+             TÍTULO
+             ================================================= -->
+
+        <h3 class="start-dialog__title">
+            Programar reunión
+        </h3>
+
+
+       <!-- =============================================
+     TÍTULO DE LA REUNIÓN
+     ============================================= -->
+
+<div class="field">
+
+    <span class="field__label">
+        Título de la reunión
+    </span>
+
+    <input
+        type="text"
+        class="field__input"
+        id="input-titulo"
+        maxlength="200"
+        placeholder="Ej. Reunión semanal de seguimiento"
+        required
+    >
+
+</div>
+
+
+        <!-- =================================================
+             FECHA Y HORA
+             ================================================= -->
+
+        <div class="field-row">
+
+            <label class="field">
+
+                <span class="field__label">
+                    Fecha
+                </span>
+
+                <input
+                    type="date"
+                    class="field__input"
+                    id="input-fecha"
+                    required
+                >
+
+            </label>
+
+
+            <label class="field">
+
+                <span class="field__label">
+                    Hora
+                </span>
+
+                <input
+                    type="time"
+                    class="field__input"
+                    id="input-hora"
+                    required
+                >
+
+            </label>
+
+        </div>
+
+
+        <!-- =================================================
+             DEPARTAMENTO
+             ================================================= -->
+
+        <div class="meeting-field">
+
+            <label for="reunion-departamento">
+                Departamento
+            </label>
+
+            <select
+                id="reunion-departamento"
+                class="meeting-select"
+            >
+
+                <option value="">
+                    Seleccione un departamento
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- =================================================
+             ÁREA
+             ================================================= -->
+
+        <div class="meeting-field">
+
+            <label for="reunion-area">
+                Área
+            </label>
+
+            <select
+                id="reunion-area"
+                class="meeting-select"
+                disabled
+            >
+
+                <option value="">
+                    Seleccione primero un departamento
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- =================================================
+             PARTICIPANTES
+             ================================================= -->
+
+        <div class="meeting-participants">
+
+            <span class="field__label">
+                Participantes
+            </span>
+
+
+            <!-- =============================================
+                 LISTAS
+                 ============================================= -->
+
+            <div class="meeting-participants__lists">
+
+
+                <!-- =========================================
+                     USUARIOS DISPONIBLES
+                     ========================================= -->
+
+                <div class="meeting-participants__list-container">
+
+                    <div class="meeting-participants__list-title">
+                        Usuarios disponibles
+                    </div>
+
+
+                    <div
+                        id="usuarios-disponibles"
+                        class="meeting-participants__list"
+                    >
+
+                        <div class="meeting-participants__empty">
+                            Seleccione un departamento y un área.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     BOTONES DE TRANSFERENCIA
+                     ========================================= -->
+
+                <div class="meeting-participants__actions">
+
+                    <button
+                        type="button"
+                        id="btn-agregar-participantes"
+                        class="meeting-participants__action"
+                        disabled
+                        title="Agregar usuario"
+                    >
+                        →
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btn-quitar-participantes"
+                        class="meeting-participants__action"
+                        disabled
+                        title="Quitar usuario"
+                    >
+                        ←
+                    </button>
+
+                </div>
+
+
+                <!-- =========================================
+                     INVITADOS
+                     ========================================= -->
+
+                <div class="meeting-participants__list-container">
+
+                    <div class="meeting-participants__list-title">
+                        Invitados
+                    </div>
+
+
+                    <div
+                        id="usuarios-invitados"
+                        class="meeting-participants__list"
+                    >
+
+                        <div
+                            class="meeting-participants__empty"
+                            id="invitados-empty"
+                        >
+                            No hay invitados seleccionados.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 MENSAJE DE VALIDACIÓN
+                 ============================================= -->
+
+            <span
+                class="start-dialog__aviso"
+                id="aviso-participantes"
+            >
+                Se necesitan al menos 2 participantes
+                para programar una reunión.
+            </span>
+
+        </div>
+
+
+        <!-- =================================================
+             DURACIÓN
+             ================================================= -->
+
+        <div class="field">
+
+            <span class="field__label">
+                Duración (minutos)
+            </span>
+
+
+            <input
+                type="number"
+                class="field__input"
+                id="input-duracion"
+                value="60"
+                min="1"
+                required
+            >
+
+        </div>
+
+
+ <!-- =================================================
+             ACCIONES
+             ================================================= -->
+
+        <div class="start-dialog__actions">
+
+            <button
+                type="button"
+                class="start-dialog__cancel"
+            >
+                Cancelar
+            </button>
+
+
+            <button
+                type="submit"
+                class="start-dialog__confirm"
+                disabled
+            >
+                Programar
+            </button>
+
+        </div>
+
+    </form>
+
+</dialog>
+
+
+    <!-- =========================================================
+         JAVASCRIPT PRINCIPAL
+         ========================================================= -->
+
+    <script
+        type="module"
+        src="js/main.js"
+    ></script>
 
 </body>
+
 </html>

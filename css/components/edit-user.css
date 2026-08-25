@@ -1,0 +1,233 @@
+/* =========================================================
+   EDITAR USUARIO
+   ========================================================= */
+
+.edit-user-view {
+
+    width: 100%;
+    max-width: 760px;
+
+    margin: 0 auto;
+
+    padding: 10px 0 40px;
+
+}
+
+
+.edit-user-view__header {
+
+    margin-bottom: 30px;
+
+}
+
+
+.edit-user-view__subtitle {
+
+    margin-top: 8px;
+
+    color: #6f8798;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.edit-user-form {
+
+    background: #ffffff;
+
+    border: 1px solid #d8e6ee;
+
+    border-radius: 14px;
+
+    padding: 30px 35px;
+
+    box-shadow:
+        0 8px 25px rgba(73, 127, 157, 0.08);
+
+}
+
+
+/* =========================================================
+   GRUPOS
+   ========================================================= */
+
+.edit-user-form__group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.edit-user-form__group label {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #16486a;
+
+}
+
+
+.edit-user-form__group input,
+.edit-user-form__group select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    height: 44px;
+
+    padding: 0 13px;
+
+    border: 1px solid #cbdde8;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #16486a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+
+}
+
+
+.edit-user-form__group input:focus,
+.edit-user-form__group select:focus {
+
+    border-color: #49a7df;
+
+    box-shadow:
+        0 0 0 3px rgba(73, 167, 223, 0.15);
+
+}
+
+
+.edit-user-form__group select:disabled {
+
+    background: #f1f5f7;
+
+    color: #9aaeb9;
+
+    cursor: not-allowed;
+
+}
+
+
+.edit-user-form__group small {
+
+    color: #7b909e;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.edit-user-form__error {
+
+    padding: 11px 13px;
+
+    margin-bottom: 18px;
+
+    border-radius: 7px;
+
+    background: #fde7e7;
+
+    color: #a14d4d;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.edit-user-form__actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 28px;
+
+}
+
+
+.edit-user-form__cancel,
+.edit-user-form__submit {
+
+    height: 42px;
+
+    padding: 0 20px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+.edit-user-form__cancel {
+
+    border: 1px solid #d5e1e8;
+
+    background: #ffffff;
+
+    color: #587080;
+
+}
+
+
+.edit-user-form__submit {
+
+    border: none;
+
+    background: #4ba6df;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 5px 12px rgba(75, 166, 223, 0.22);
+
+}
+
+
+.edit-user-form__submit:hover {
+
+    background: #3898d5;
+
+}

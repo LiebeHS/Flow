@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Flow - Iniciar sesión</title>
+
+    <!-- CSS GENERAL -->
+    <link
+        rel="stylesheet"
+        href="./css/main.css"
+    >
+
+    <!-- CSS ESPECÍFICO DEL LOGIN -->
+    <link
+        rel="stylesheet"
+        href="./css/login.css"
+    >
+
+</head>
+
+<body>
+
+    <!-- =====================================================
+         LOGIN FLOW
+         ===================================================== -->
+
+    <section
+        id="vista-login"
+        class="login-view"
+    >
+
+        <!-- Fondo decorativo -->
+        <div class="login-background">
+
+            <div
+                class="login-background__shape login-background__shape--1"
+            ></div>
+
+            <div
+                class="login-background__shape login-background__shape--2"
+            ></div>
+
+            <div
+                class="login-background__shape login-background__shape--3"
+            ></div>
+
+        </div>
+
+
+        <!-- Tarjeta de Login -->
+        <div class="login-card">
+
+
+            <!-- Logo -->
+            <div class="login-card__logo">
+
+                <img
+                    src="./assets/flowlogo.PNG"
+                    alt="Flow"
+                >
+
+            </div>
+
+
+            <!-- Título -->
+            <div class="login-card__header">
+
+                <h1>
+                    Bienvenido a Flow
+                </h1>
+
+                <p>
+                    Inicia sesión para continuar
+                </p>
+
+            </div>
+
+
+            <!-- Formulario -->
+            <form
+                id="login-form"
+                class="login-form"
+            >
+
+                <!-- Correo -->
+                <div class="login-form__group">
+
+                    <label
+                        for="login-correo"
+                    >
+                        Correo electrónico
+                    </label>
+
+                    <div class="login-form__input">
+
+                        <span class="login-form__icon">
+                            ✉
+                        </span>
+
+                        <input
+                            type="email"
+                            id="login-correo"
+                            name="correo"
+                            placeholder="correo@empresa.com"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Contraseña -->
+                <div class="login-form__group">
+
+                    <label
+                        for="login-password"
+                    >
+                        Contraseña
+                    </label>
+
+                    <div class="login-form__input">
+
+                        <span class="login-form__icon">
+                            🔒
+                        </span>
+
+                        <input
+                            type="password"
+                            id="login-password"
+                            name="password"
+                            placeholder="Ingresa tu contraseña"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="btn-mostrar-password"
+                            class="login-form__password-toggle"
+                            aria-label="Mostrar contraseña"
+                        >
+                            ◉
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Mensaje de error -->
+                <div
+                    id="login-error"
+                    class="login-form__error"
+                    hidden
+                >
+                    Correo o contraseña incorrectos.
+                </div>
+
+
+                <!-- Botón -->
+                <button
+                    type="submit"
+                    id="btn-login"
+                    class="login-form__submit"
+                >
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+
+            <!-- Pie -->
+            <div class="login-card__footer">
+
+                <span>
+                    By SOCOADA
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <script type="module">
+
+    import {
+        initLogin
+    } from "./js/components/login.js";
+
+
+    initLogin();
+
+</script>
+
+</body>
+
+</html>

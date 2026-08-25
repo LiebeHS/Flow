@@ -1,78 +1,366 @@
-import { loadData, saveData } from "./storage.service.js";
-import { getReunionActivaId, clearReunionActiva } from "./session.js";
+import {
+  loadData,
+  saveData
+} from "./storage.service.js";
 
-const HISTORIAL_KEY = "flow.historial";
-const PENDIENTES_KEY = "flow.pendientes";
+import {
+  getReunionActivaId,
+  clearReunionActiva
+} from "./session.js";
+
+
+/* =========================================================
+   CLAVES DE STORAGE
+   ========================================================= */
+
+const HISTORIAL_KEY =
+  "flow.historial";
+
+const PENDIENTES_KEY =
+  "flow.pendientes";
+
+
+/* =========================================================
+   SECCIONES DE UNA REUNIÓN
+   ========================================================= */
 
 const SECCIONES = [
-  "objetivos", "asuntos", "compromisos", "desarrollo",
-  "otros", "competitividad", "acuerdos", "reflexion", "enlaces",
+  "objetivos",
+  "asuntos",
+  "compromisos",
+  "desarrollo",
+  "otros",
+  "competitividad",
+  "acuerdos",
+  "reflexion",
+  "enlaces"
 ];
 
-function leerSeccion(id, seccion, fallback) {
-  return loadData(`flow.reunion.${id}.${seccion}`, fallback);
+
+/* =========================================================
+   LEER SECCIÓN
+   ========================================================= */
+
+function leerSeccion(
+  id,
+  seccion,
+  fallback
+) {
+
+  return loadData(
+    `flow.reunion.${id}.${seccion}`,
+    fallback
+  );
+
 }
+
+
+/* =========================================================
+   EMPAQUETAR REUNIÓN
+   ========================================================= */
 
 function empaquetarReunion(id) {
+
   const reunion = {
-    meta: loadData(`flow.reunion.${id}.meta`, {}),
-    secciones: {},
+
+    meta:
+      loadData(
+        `flow.reunion.${id}.meta`,
+        {}
+      ),
+
+    secciones: {}
+
   };
 
-  SECCIONES.forEach((seccion) => {
-    const fallback = seccion === "desarrollo" ? {} : [];
-    reunion.secciones[seccion] = leerSeccion(id, seccion, fallback);
-  });
+
+  SECCIONES.forEach(
+    (seccion) => {
+
+      const fallback =
+        seccion === "desarrollo"
+          ? {}
+          : [];
+
+
+      reunion.secciones[seccion] =
+        leerSeccion(
+          id,
+          seccion,
+          fallback
+        );
+
+    }
+  );
+
 
   return reunion;
+
 }
 
+
+/* =========================================================
+   CALCULAR PENDIENTES
+   ========================================================= */
+
 function calcularPendientes(id) {
-  const objetivos = leerSeccion(id, "objetivos", []);
-  const compromisos = leerSeccion(id, "compromisos", []);
-  const desarrollo = leerSeccion(id, "desarrollo", {});
 
-  const objetivosPendientes = objetivos.filter((o) => !o.done);
+  const objetivos =
+    leerSeccion(
+      id,
+      "objetivos",
+      []
+    );
 
-  const compromisosPendientes = compromisos.filter((c) => c.estado !== "completado");
+
+  const compromisos =
+    leerSeccion(
+      id,
+      "compromisos",
+      []
+    );
+
+
+  const desarrollo =
+    leerSeccion(
+      id,
+      "desarrollo",
+      {}
+    );
+
+
+  /*
+   * Objetivos que no fueron completados
+   */
+
+  const objetivosPendientes =
+    objetivos.filter(
+      (objetivo) =>
+        !objetivo.done
+    );
+
+
+  /*
+   * Compromisos que no fueron completados
+   */
+
+  const compromisosPendientes =
+    compromisos.filter(
+      (compromiso) =>
+        compromiso.estado !==
+        "completado"
+    );
+
+
+  /*
+   * Desarrollo asociado a objetivos pendientes
+   */
 
   const desarrolloPendiente = {};
-    objetivosPendientes.forEach((obj) => {
-    if (desarrollo[obj.id]) {
-      desarrolloPendiente[obj.id] = desarrollo[obj.id];
+
+
+  objetivosPendientes.forEach(
+    (objetivo) => {
+
+      if (
+        desarrollo[objetivo.id]
+      ) {
+
+        desarrolloPendiente[
+          objetivo.id
+        ] =
+          desarrollo[objetivo.id];
+
+      }
+
     }
-  });
+  );
 
 
   return {
-    objetivos: objetivosPendientes,
-    compromisos: compromisosPendientes,
-    desarrollo: desarrolloPendiente,
+
+    objetivos:
+      objetivosPendientes,
+
+    compromisos:
+      compromisosPendientes,
+
+    desarrollo:
+      desarrolloPendiente
+
   };
+
 }
+
+
+/* =========================================================
+   TERMINAR REUNIÓN
+   ========================================================= */
 
 export function terminarReunion() {
-  const id = getReunionActivaId();
-  if (id === null) return;
 
-  const reunion = empaquetarReunion(id);
-  reunion.meta.estado = "terminada";
-  reunion.meta.fechaTermino = new Date().toISOString();
+  /*
+   * Obtener la reunión actualmente activa
+   */
 
-  const historial = loadData(HISTORIAL_KEY, []);
-  historial.push(reunion);
-  saveData(HISTORIAL_KEY, historial);
+  const id =
+    getReunionActivaId();
 
-  const pendientes = calcularPendientes(id);
-  saveData(PENDIENTES_KEY, pendientes);
+
+  /*
+   * No hay reunión activa
+   */
+
+  if (
+    id === null ||
+    id === undefined
+  ) {
+
+    console.warn(
+      "No existe una reunión activa para terminar."
+    );
+
+    return false;
+
+  }
+
+
+  /*
+   * Recuperar todos los datos
+   * de la reunión actual
+   */
+
+  const reunion =
+    empaquetarReunion(id);
+
+
+  /*
+   * Validar que realmente exista
+   * la información principal
+   */
+
+  if (
+    !reunion.meta ||
+    !reunion.meta.id
+  ) {
+
+    console.error(
+      "No se encontró la información de la reunión activa:",
+      id
+    );
+
+    return false;
+
+  }
+
+
+  /* =====================================================
+     ACTUALIZAR ESTADO
+     ===================================================== */
+
+  reunion.meta.estado =
+    "terminada";
+
+
+  reunion.meta.fechaTermino =
+    new Date().toISOString();
+
+
+  /*
+   * Mantener la fecha de inicio
+   * si ya existe.
+   *
+   * No se modifica:
+   *
+   * reunion.meta.fecha
+   *
+   * porque representa la fecha programada
+   * de la reunión.
+   */
+
+
+  /* =====================================================
+     GUARDAR EN HISTORIAL
+     ===================================================== */
+
+  const historial =
+    loadData(
+      HISTORIAL_KEY,
+      []
+    );
+
+
+  historial.push(
+    reunion
+  );
+
+
+  saveData(
+    HISTORIAL_KEY,
+    historial
+  );
+
+
+  /* =====================================================
+     GUARDAR PENDIENTES
+     ===================================================== */
+
+  const pendientes =
+    calcularPendientes(id);
+
+
+  saveData(
+    PENDIENTES_KEY,
+    pendientes
+  );
+
+
+  /* =====================================================
+     ELIMINAR DATOS TEMPORALES
+     ===================================================== */
 
   limpiarDatosReunion(id);
+
+
+  /* =====================================================
+     LIMPIAR SESIÓN ACTIVA
+     ===================================================== */
+
   clearReunionActiva();
+
+
+  return true;
+
 }
 
-function limpiarDatosReunion(id){
-    localStorage.removeItem(`flow.reunion.${id}.meta`);
-    SECCIONES.forEach((section)=>{
-        localStorage.removeItem(`flow.reunion.${id}.${section}`)
-    })
+
+/* =========================================================
+   LIMPIAR DATOS DE REUNIÓN
+   ========================================================= */
+
+function limpiarDatosReunion(id) {
+
+  /*
+   * Eliminar metadata
+   */
+
+  localStorage.removeItem(
+    `flow.reunion.${id}.meta`
+  );
+
+
+  /*
+   * Eliminar todas las secciones
+   */
+
+  SECCIONES.forEach(
+    (seccion) => {
+
+      localStorage.removeItem(
+        `flow.reunion.${id}.${seccion}`
+      );
+
+    }
+  );
+
 }
