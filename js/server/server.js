@@ -2265,6 +2265,7 @@ app.use(
 
 app.listen(
     PORT,
+    "0.0.0.0",
     () => {
 
         console.log(
@@ -2280,11 +2281,15 @@ app.listen(
         );
 
         console.log(
-            `Servidor ejecutándose en: http://localhost:${PORT}`
+            `Servidor escuchando en el puerto ${PORT}`
         );
 
         console.log(
-            `API usuarios: http://localhost:${PORT}/api/usuarios`
+            `API local: http://localhost:${PORT}/api`
+        );
+
+        console.log(
+            `API red: http://10.130.10.200:${PORT}/api`
         );
 
         console.log(

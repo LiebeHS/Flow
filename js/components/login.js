@@ -2,6 +2,10 @@
    LOGIN
    ========================================================= */
 
+   import {
+    API_URL
+} from "./config.js";
+
 export function initLogin() {
 
     const form =
@@ -142,7 +146,7 @@ export function initLogin() {
 
                 const response =
                     await fetch(
-                        "http://localhost:3000/api/login",
+                         `${API_URL}/login`,
                         {
 
                             method:
