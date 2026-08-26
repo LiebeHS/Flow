@@ -1658,22 +1658,30 @@
             class="view view--hidden"
         >
 
-            <div class="archive__banner">
+<div class="archive__header">
+  <div style="display: contents;">
+    <button
+        type="button"
+        id="archive-back"
+        class="archive__back-button"
+    >
+        ← Volver al historial
+    </button>
 
-                <button
-                    type="button"
-                    class="archive__back"
-                    id="archive-back"
-                >
-                    ← Volver al historial
-                </button>
+
+    <span class="archive__readonly-label">
+        Reunión archivada · solo lectura
+    </span>
 
 
-                <span class="archive__label">
-                    Reunión archivada · solo lectura
-                </span>
-
-            </div>
+    <button
+        type="button"
+        id="archive-export-pdf"
+        class="archive__export-button"
+    >
+        Exportar PDF
+    </button>
+ </div>
 
 
             <div
