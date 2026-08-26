@@ -951,7 +951,7 @@ if (!usuarioAutenticado()) {
 
 const usuarioNombre =
     document.querySelector(
-        "#usuario-nombre"
+        "#usuario-actual-nombre"
     );
 
 
