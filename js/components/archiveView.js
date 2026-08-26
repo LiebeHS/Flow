@@ -7,8 +7,19 @@ import {
 } from "../services/viewManager.js";
 
 import {
+    exportarReunionPDF
+} from "../services/pdfReportService.js";
+
+import {
     API_URL
 } from "./config.js";
+
+
+let reunionActual =
+    null;
+
+let seccionesActuales =
+    {};
 
 
 /* =========================================================
@@ -44,6 +55,11 @@ export function createArchiveView() {
     const backBtn =
         document.querySelector(
             "#archive-back"
+        );
+
+     const pdfBtn =
+        document.querySelector(
+             "#archive-export-pdf"
         );
 
 
@@ -534,6 +550,12 @@ export function createArchiveView() {
                     secciones
                 );
 
+                reunionActual =
+            reunion;
+
+                seccionesActuales =
+                s;
+
 
             console.log(
                 "REUNIÓN:",
@@ -864,6 +886,57 @@ export function createArchiveView() {
         );
 
     }
+
+    if (
+    pdfBtn
+) {
+
+    pdfBtn.addEventListener(
+        "click",
+        function () {
+
+            try {
+
+                if (
+                    !reunionActual
+                ) {
+
+                    alert(
+                        "No hay una reunión cargada."
+                    );
+
+                    return;
+
+                }
+
+
+                exportarReunionPDF(
+                    reunionActual,
+                    seccionesActuales,
+                    reunionActual.participantes ||
+                    []
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "ERROR EXPORTANDO PDF:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "No fue posible generar el PDF."
+                );
+
+            }
+
+        }
+    );
+
+}
 
 
     /* =========================================================
