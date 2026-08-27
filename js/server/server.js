@@ -1334,6 +1334,141 @@ app.get(
 
 
 /* =========================================================
+   OBTENER TODOS LOS COMPROMISOS
+   ========================================================= */
+
+app.get(
+    "/api/compromisos",
+    async (req, res) => {
+
+        try {
+
+            const [rows] =
+                await db.execute(
+                    `
+                    SELECT
+                        rs.ReunionId,
+                        rs.Contenido,
+                        r.Titulo AS ReunionTitulo,
+                        r.FechaInicio AS ReunionFechaInicio,
+                        r.Estado AS ReunionEstado
+                    FROM reunion_secciones rs
+                    INNER JOIN reuniones r
+                        ON r.ReunionId = rs.ReunionId
+                    WHERE
+                        rs.Seccion = 'compromisos'
+                        AND r.Estado <> 'Cancelada'
+                    `
+                );
+
+
+            const compromisos =
+                rows.flatMap(
+                    row => {
+
+                        let contenido =
+                            row.Contenido;
+
+
+                        if (
+                            typeof contenido ===
+                            "string"
+                        ) {
+
+                            try {
+
+                                contenido =
+                                    JSON.parse(
+                                        contenido
+                                    );
+
+                            }
+                            catch (error) {
+
+                                console.error(
+                                    "ERROR PARSEANDO COMPROMISOS:",
+                                    error
+                                );
+
+                                contenido =
+                                    [];
+
+                            }
+
+                        }
+
+
+                        if (
+                            !Array.isArray(
+                                contenido
+                            )
+                        ) {
+
+                            return [];
+
+                        }
+
+
+                        return contenido.map(
+                            compromiso => ({
+
+                                ...compromiso,
+
+                                reunionId:
+                                    row.ReunionId,
+
+                                reunionTitulo:
+                                    row.ReunionTitulo,
+
+                                reunionFecha:
+                                    row.ReunionFechaInicio
+
+                            })
+                        );
+
+                    }
+                );
+
+
+            return res.json({
+
+                ok: true,
+
+                compromisos:
+                    compromisos
+
+            });
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR AL OBTENER COMPROMISOS:",
+                error
+            );
+
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible obtener los compromisos.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    OBTENER SECCIONES DE UNA REUNIÓN
    ========================================================= */
 

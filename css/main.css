@@ -30,6 +30,7 @@
 /* Reunión */
 @import "components/editable-list.css";
 @import "components/commitment-list.css";
+@import "components/commitments-view.css";
 @import "components/development-table.css";
 @import "components/text-section.css";
 @import "components/link-list.css";

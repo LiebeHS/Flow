@@ -1637,9 +1637,70 @@
 
                 <div class="commitments-view__content">
 
-                    <p>
-                        El módulo global de compromisos estará disponible
-                        próximamente.
+                    <div class="commitments-filters">
+
+                        <div class="commitments-filter">
+
+                            <label for="compromisos-filtro-usuario">
+                                Usuario
+                            </label>
+
+                            <select
+                                id="compromisos-filtro-usuario"
+                                class="commitments-filter__select"
+                            >
+
+                                <option value="">
+                                    Todos los usuarios
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="commitments-filter">
+
+                            <label for="compromisos-filtro-estado">
+                                Estado
+                            </label>
+
+                            <select
+                                id="compromisos-filtro-estado"
+                                class="commitments-filter__select"
+                            >
+
+                                <option value="activos" selected>
+                                    Activos
+                                </option>
+
+                                <option value="pendiente">
+                                    Pendiente
+                                </option>
+
+                                <option value="en-progreso">
+                                    En progreso
+                                </option>
+
+                                <option value="completado">
+                                    Completado
+                                </option>
+
+                                <option value="todos">
+                                    Todos
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <ul class="commitments-view__list"></ul>
+
+                    <p class="commitments-view__empty" hidden>
+                        No hay compromisos con estos filtros.
                     </p>
 
                 </div>

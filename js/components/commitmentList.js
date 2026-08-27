@@ -1,12 +1,12 @@
 import { loadData, saveData } from "../services/storage.service.js";
 
-const ESTADO_LABEL = {
+export const ESTADO_LABEL = {
   "pendiente": "Pendiente",
   "en-progreso": "En progreso",
   "completado": "Completado",
 };
 
-const PRIORIDAD_LABEL = {
+export const PRIORIDAD_LABEL = {
   "alta": "Prioridad alta",
   "media": "Prioridad media",
   "baja": "Prioridad baja",

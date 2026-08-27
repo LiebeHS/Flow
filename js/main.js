@@ -63,6 +63,10 @@ import {
 } from "./components/userEdit.js";
 
 import {
+    initCommitmentsView
+} from "./components/commitmentsView.js";
+
+import {
     initLogin
 } from "./components/login.js";
 
@@ -146,6 +150,35 @@ function inicializarNavegacion() {
      * =====================================================
      */
 
+    /*
+     * =====================================================
+     * NAVEGAR A UNA VISTA
+     * =====================================================
+     *
+     * Centraliza el cambio de vista para poder
+     * refrescar datos según la vista de destino.
+     */
+
+    function navegarAVista(
+        vista
+    ) {
+
+        if (
+            vista === "compromisos"
+        ) {
+
+            commitmentsView.render();
+
+        }
+
+
+        showView(
+            vista
+        );
+
+    }
+
+
     const tarjetas =
         document.querySelectorAll(
             ".dashboard-card[data-view]"
@@ -193,7 +226,7 @@ function inicializarNavegacion() {
                     );
 
 
-                    showView(
+                    navegarAVista(
                         vista
                     );
 
@@ -269,7 +302,7 @@ function inicializarNavegacion() {
                     );
 
 
-                    showView(
+                    navegarAVista(
                         vista
                     );
 
@@ -1010,6 +1043,14 @@ initUserRegistration();
 initUserManagement();
 
 initUserEdit();
+
+
+/* =========================================================
+   VISTA GLOBAL DE COMPROMISOS
+   ========================================================= */
+
+const commitmentsView =
+    initCommitmentsView();
 
 
 /* =========================================================

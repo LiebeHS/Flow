@@ -1,0 +1,157 @@
+/* =========================================================
+   FLOW - VISTA GLOBAL DE COMPROMISOS
+   ========================================================= */
+
+
+/* =========================================================
+   SUBTÍTULO
+   ========================================================= */
+
+.commitments-view__subtitle {
+    margin: 8px 0 0;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+    color: var(--color-text-subtle);
+}
+
+
+/* =========================================================
+   BARRA DE FILTROS
+   ========================================================= */
+
+.commitments-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+
+    width: 100%;
+    margin-bottom: 24px;
+
+    padding: 18px 20px;
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background-color: var(--color-surface-alt);
+}
+
+
+.commitments-filter {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 220px;
+}
+
+
+.commitments-filter label {
+    font-size: 13px;
+    font-weight: var(--weight-bold);
+
+    color: var(--color-text);
+}
+
+
+.commitments-filter__select {
+    height: 40px;
+
+    min-width: 220px;
+
+    padding: 0 12px;
+
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-surface);
+
+    color: var(--color-text);
+
+    font-family: inherit;
+    font-size: 14px;
+}
+
+
+.commitments-filter__select:focus {
+    outline: none;
+
+    border-color: var(--color-accent);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 48, 73, 0.12);
+}
+
+
+/* =========================================================
+   LISTA DE COMPROMISOS
+   ========================================================= */
+
+.commitments-view__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    margin: 0 0 var(--space-md);
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* =========================================================
+   ORIGEN (REUNIÓN)
+   ========================================================= */
+
+.commitments-view__origin {
+    margin-top: var(--space-2xs);
+
+    font-size: var(--text-xs);
+
+    color: var(--color-text-subtle);
+}
+
+
+/* =========================================================
+   ESTADO VACÍO
+   ========================================================= */
+
+.commitments-view__empty {
+    width: 100%;
+
+    margin: 0;
+
+    padding: 40px 20px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    color: var(--color-text-subtle);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .commitments-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .commitments-filter,
+    .commitments-filter__select {
+        width: 100%;
+        min-width: 0;
+    }
+
+}
