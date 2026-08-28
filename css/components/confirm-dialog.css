@@ -43,6 +43,6 @@ dialog{
 
 .confirm-dialog__accept {
   border: none;
-  background-color: var(--color-danger);
+  background-color: var(--color-success);
   color: #ffffff;
 }

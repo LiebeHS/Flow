@@ -8,6 +8,10 @@ import {
   clearReunionActiva
 } from "./session.js";
 
+import {
+  agruparPorPrioridad
+} from "../utils/agruparPorPrioridad.js";
+
 
 /* =========================================================
    CLAVES DE STORAGE
@@ -141,15 +145,34 @@ function calcularPendientes(id) {
 
 
   /*
-   * Compromisos que no fueron completados
+   * Compromisos que no fueron completados.
+   *
+   * Los que ya se mostraron una vez como "vencido"
+   * informativo (vencidoInformativo === true) no se
+   * vuelven a heredar en una segunda reunión.
    */
 
   const compromisosPendientes =
-    compromisos.filter(
-      (compromiso) =>
-        compromiso.estado !==
-        "completado"
-    );
+    compromisos
+      .filter(
+        (compromiso) =>
+          compromiso.estado !== "completado" &&
+          !compromiso.vencidoInformativo
+      )
+      .map(
+        (compromiso) => {
+
+          const vencido =
+            compromiso.fechaLimite &&
+            new Date(compromiso.fechaLimite) < new Date();
+
+
+          return vencido
+            ? { ...compromiso, vencidoInformativo: true }
+            : compromiso;
+
+        }
+      );
 
 
   /*
@@ -166,10 +189,27 @@ function calcularPendientes(id) {
         desarrollo[objetivo.id]
       ) {
 
+        /*
+         * Los puntos ya completados al 100%
+         * no se heredan a la siguiente reunión.
+         */
+
+        const bloquesVigentes =
+          desarrollo[objetivo.id].filter(
+            (bloque) =>
+              !(
+                bloque.tipo === "punto" &&
+                bloque.avance === 100
+              )
+          );
+
+
         desarrolloPendiente[
           objetivo.id
         ] =
-          desarrollo[objetivo.id];
+          agruparPorPrioridad(
+            bloquesVigentes
+          );
 
       }
 
@@ -315,11 +355,11 @@ export function terminarReunion() {
   );
 
 
-  /* =====================================================
-     ELIMINAR DATOS TEMPORALES
-     ===================================================== */
-
-  limpiarDatosReunion(id);
+  /*
+   * Ya no se borran los datos locales de la reunión aquí:
+   * sigue siendo editable (desde la vista de Archivo)
+   * mientras dure el día calendario en que se terminó.
+   */
 
 
   /* =====================================================
@@ -330,37 +370,5 @@ export function terminarReunion() {
 
 
   return true;
-
-}
-
-
-/* =========================================================
-   LIMPIAR DATOS DE REUNIÓN
-   ========================================================= */
-
-function limpiarDatosReunion(id) {
-
-  /*
-   * Eliminar metadata
-   */
-
-  localStorage.removeItem(
-    `flow.reunion.${id}.meta`
-  );
-
-
-  /*
-   * Eliminar todas las secciones
-   */
-
-  SECCIONES.forEach(
-    (seccion) => {
-
-      localStorage.removeItem(
-        `flow.reunion.${id}.${seccion}`
-      );
-
-    }
-  );
 
 }

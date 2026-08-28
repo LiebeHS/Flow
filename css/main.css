@@ -749,7 +749,8 @@ body {
    CONTENIDO
    ========================================================= */
 
-.archive__content {
+.archive__content,
+.archive__editable {
 
     width: 100%;
 

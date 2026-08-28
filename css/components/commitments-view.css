@@ -118,6 +118,59 @@
 
 
 /* =========================================================
+   EDICIÓN (ESTADO / FECHA LÍMITE)
+   ========================================================= */
+
+.commitments-view__edit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+
+    border-top: 1px dashed var(--color-border);
+}
+
+.commitments-view__edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-subtle);
+}
+
+.commitments-view__estado-edit,
+.commitments-view__fecha-edit {
+    height: 32px;
+
+    padding: 0 var(--space-xs);
+
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-surface);
+
+    color: var(--color-text);
+
+    font-family: inherit;
+    font-size: var(--text-sm);
+}
+
+.commitments-view__estado-edit:focus,
+.commitments-view__fecha-edit:focus {
+    outline: none;
+
+    border-color: var(--color-accent);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 48, 73, 0.12);
+}
+
+
+/* =========================================================
    ESTADO VACÍO
    ========================================================= */
 

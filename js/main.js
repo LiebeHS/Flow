@@ -1,4 +1,8 @@
 import {
+    reiniciarContenedor
+} from "./utils/reiniciarContenedor.js";
+
+import {
     createEditableList
 } from "./components/editableList.js";
 
@@ -65,6 +69,10 @@ import {
 import {
     initCommitmentsView
 } from "./components/commitmentsView.js";
+
+import {
+    initSettingsMenu
+} from "./components/settingsMenu.js";
 
 import {
     initLogin
@@ -381,7 +389,7 @@ function montarReunion() {
         createDevelopmentTable({
 
             container:
-                document.querySelector(
+                reiniciarContenedor(
                     "#desarrollo"
                 ),
 
@@ -402,7 +410,7 @@ function montarReunion() {
     createEditableList({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#objetivos"
             ),
 
@@ -435,7 +443,7 @@ function montarReunion() {
     createEditableList({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#asuntos"
             ),
 
@@ -459,7 +467,7 @@ function montarReunion() {
     createCommitmentList({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#compromisos"
             ),
 
@@ -480,7 +488,7 @@ function montarReunion() {
     createTextSection({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#otros"
             ),
 
@@ -504,7 +512,7 @@ function montarReunion() {
     createTextSection({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#competitividad"
             ),
 
@@ -528,7 +536,7 @@ function montarReunion() {
     createTextSection({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#acuerdos"
             ),
 
@@ -552,7 +560,7 @@ function montarReunion() {
     createTextSection({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#reflexion"
             ),
 
@@ -576,7 +584,7 @@ function montarReunion() {
     createLinkList({
 
         container:
-            document.querySelector(
+            reiniciarContenedor(
                 "#enlaces"
             ),
 
@@ -1051,6 +1059,13 @@ initUserEdit();
 
 const commitmentsView =
     initCommitmentsView();
+
+
+/* =========================================================
+   MENÚ DE CONFIGURACIÓN
+   ========================================================= */
+
+initSettingsMenu();
 
 
 /* =========================================================

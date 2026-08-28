@@ -21,6 +21,18 @@ const ESTADOS_ACTIVOS = [
     "en-progreso"
 ];
 
+/*
+ * Únicos estados que se pueden asignar manualmente desde esta
+ * vista. "vencido" no está aquí porque no es un valor guardado
+ * en la base de datos: se calcula solo (ver server.js), así que
+ * no tiene sentido poder "elegirlo".
+ */
+const ESTADOS_EDITABLES = [
+    "pendiente",
+    "en-progreso",
+    "completado"
+];
+
 
 /* =========================================================
    INICIALIZAR VISTA
@@ -130,6 +142,127 @@ export function initCommitmentsView() {
 
 
     /* =====================================================
+       FECHA PARA <input type="date">
+       ===================================================== */
+
+    function aValorInputFecha(
+        fecha
+    ) {
+
+        if (!fecha) {
+
+            return "";
+
+        }
+
+
+        const d =
+            new Date(
+                fecha
+            );
+
+
+        if (
+            Number.isNaN(
+                d.getTime()
+            )
+        ) {
+
+            return "";
+
+        }
+
+
+        const mes =
+            String(
+                d.getMonth() + 1
+            ).padStart(2, "0");
+
+
+        const dia =
+            String(
+                d.getDate()
+            ).padStart(2, "0");
+
+
+        return (
+            `${d.getFullYear()}-${mes}-${dia}`
+        );
+
+    }
+
+
+    /* =====================================================
+       GUARDAR EDICIÓN (ESTADO / FECHA LÍMITE)
+       ===================================================== */
+
+    async function guardarEdicion(
+        id,
+        cambios
+    ) {
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/compromisos/${id}`,
+                    {
+
+                        method:
+                            "PATCH",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                cambios
+                            )
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.mensaje ||
+                    data.error ||
+                    "No fue posible actualizar el compromiso."
+                );
+
+            }
+
+
+            await render();
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR ACTUALIZANDO COMPROMISO:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "No fue posible actualizar el compromiso."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
        CARGAR COMPROMISOS DESDE LA API
        ===================================================== */
 
@@ -197,11 +330,9 @@ export function initCommitmentsView() {
 
         const usuarios =
             [...new Set(
-                compromisos.flatMap(
-                    c =>
-                        c.colaboradores ||
-                        []
-                )
+                compromisos
+                    .map(c => c.usuarioAsignadoNombre)
+                    .filter(Boolean)
             )].sort(
                 (a, b) =>
                     a.localeCompare(b)
@@ -331,7 +462,7 @@ export function initCommitmentsView() {
         );
 
         meta.textContent =
-            `${(data.colaboradores || []).join(", ")} · ${data.fechaInicio || "?"} → ${data.fechaLimite || "?"} · ${PRIORIDAD_LABEL[data.prioridad] || data.prioridad}`;
+            `${data.usuarioAsignadoNombre || "?"} · ${formatearFecha(data.fechaInicio)} → ${formatearFecha(data.fechaLimite)} · ${PRIORIDAD_LABEL[data.prioridad] || data.prioridad}`;
 
 
         const origen =
@@ -345,10 +476,116 @@ export function initCommitmentsView() {
             `${data.reunionTitulo || "Reunión Flow"} · ${formatearFecha(data.reunionFecha)}`;
 
 
+        /* ---------------------------------------------
+           EDICIÓN: ESTADO Y FECHA LÍMITE
+           --------------------------------------------- */
+
+        const edicion =
+            document.createElement("div");
+
+        edicion.classList.add(
+            "commitments-view__edit"
+        );
+
+
+        const campoEstado =
+            document.createElement("label");
+
+        campoEstado.classList.add(
+            "commitments-view__edit-field"
+        );
+
+        campoEstado.textContent =
+            "Estado";
+
+
+        const selectEstado =
+            document.createElement("select");
+
+        selectEstado.classList.add(
+            "commitments-view__estado-edit"
+        );
+
+        selectEstado.dataset.id =
+            data.id;
+
+
+        ESTADOS_EDITABLES.forEach(
+            (valor) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    valor;
+
+                option.textContent =
+                    ESTADO_LABEL[valor];
+
+                if (valor === data.estadoReal) {
+
+                    option.selected =
+                        true;
+
+                }
+
+                selectEstado.appendChild(
+                    option
+                );
+
+            }
+        );
+
+        campoEstado.appendChild(
+            selectEstado
+        );
+
+
+        const campoFecha =
+            document.createElement("label");
+
+        campoFecha.classList.add(
+            "commitments-view__edit-field"
+        );
+
+        campoFecha.textContent =
+            "Fecha límite";
+
+
+        const inputFecha =
+            document.createElement("input");
+
+        inputFecha.type =
+            "date";
+
+        inputFecha.classList.add(
+            "commitments-view__fecha-edit"
+        );
+
+        inputFecha.dataset.id =
+            data.id;
+
+        inputFecha.value =
+            aValorInputFecha(
+                data.fechaLimite
+            );
+
+        campoFecha.appendChild(
+            inputFecha
+        );
+
+
+        edicion.append(
+            campoEstado,
+            campoFecha
+        );
+
+
         card.append(
             header,
             meta,
-            origen
+            origen,
+            edicion
         );
 
 
@@ -380,9 +617,7 @@ export function initCommitmentsView() {
 
                     if (
                         usuario &&
-                        !(item.colaboradores || []).includes(
-                            usuario
-                        )
+                        item.usuarioAsignadoNombre !== usuario
                     ) {
 
                         return false;
@@ -448,6 +683,79 @@ export function initCommitmentsView() {
         aplicarFiltros();
 
     }
+
+
+    /* =====================================================
+       EVENTOS DE EDICIÓN (ESTADO / FECHA LÍMITE)
+       ===================================================== */
+
+    list.addEventListener(
+        "change",
+        (event) => {
+
+            const esEstado =
+                event.target.matches(
+                    ".commitments-view__estado-edit"
+                );
+
+            const esFecha =
+                event.target.matches(
+                    ".commitments-view__fecha-edit"
+                );
+
+
+            if (
+                !esEstado &&
+                !esFecha
+            ) {
+
+                return;
+
+            }
+
+
+            const id =
+                event.target.dataset.id;
+
+            const item =
+                compromisos.find(
+                    (c) =>
+                        String(c.id) === String(id)
+                );
+
+            if (!item) {
+
+                return;
+
+            }
+
+
+            /*
+             * El backend actualiza ambos campos siempre, así
+             * que hay que mandar los dos juntos (el nuevo valor
+             * del que cambió, y el que ya tenía el otro) para
+             * no borrar el que no se tocó.
+             */
+
+            guardarEdicion(
+                id,
+                {
+
+                    estado:
+                        esEstado
+                            ? event.target.value
+                            : item.estadoReal,
+
+                    fechaLimite:
+                        esFecha
+                            ? (event.target.value || null)
+                            : aValorInputFecha(item.fechaLimite)
+
+                }
+            );
+
+        }
+    );
 
 
     /* =====================================================

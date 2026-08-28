@@ -479,16 +479,19 @@ const logoFlow =
                     compromiso => {
 
                         const responsables =
-                            Array.isArray(
-                                compromiso.colaboradores
-                            )
-                                ? compromiso.colaboradores.join(
-                                    ", "
+                            compromiso.usuarioAsignadoNombre ||
+                            (
+                                Array.isArray(
+                                    compromiso.colaboradores
                                 )
-                                : (
-                                    compromiso.colaboradores ||
-                                    ""
-                                );
+                                    ? compromiso.colaboradores.join(
+                                        ", "
+                                    )
+                                    : (
+                                        compromiso.colaboradores ||
+                                        ""
+                                    )
+                            );
 
 
                         return `

@@ -121,6 +121,18 @@
 .commitment-card--media { border-left-color: var(--color-progress); }
 .commitment-card--baja { border-left-color: var(--color-success); }
 
+.commitment-card--vencido {
+  background-color: var(--color-surface-alt);
+  border-left-color: var(--color-border-strong);
+  cursor: default;
+  opacity: 0.85;
+}
+
+.commitment-card--vencido .commitment-card__title,
+.commitment-card--vencido .commitment-card__meta {
+  color: var(--color-text-subtle);
+}
+
 .commitment-card__header {
   display: flex;
   justify-content: space-between;
@@ -155,6 +167,11 @@
 .commitment-card__badge--completado {
   background-color: var(--color-success-bg);
   color: var(--color-success-text);
+}
+
+.commitment-card__badge--vencido {
+  background-color: var(--color-border-strong);
+  color: var(--color-text);
 }
 
 .commitment-card__meta {

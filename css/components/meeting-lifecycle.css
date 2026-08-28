@@ -37,6 +37,77 @@
 }
 
 /* =========================================================
+   MENÚ DE CONFIGURACIÓN (TUERCA)
+   ========================================================= */
+
+.settings-menu {
+  position: relative;
+}
+
+.app-header__settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+}
+
+.app-header__settings svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-header__settings[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.settings-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: 200px;
+  flex-direction: column;
+  padding: var(--space-2xs);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.settings-menu__panel[hidden] {
+  display: none;
+}
+
+.settings-menu__panel:not([hidden]) {
+  display: flex;
+}
+
+.settings-menu__item {
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.settings-menu__item:hover {
+  background-color: var(--color-surface-alt);
+}
+
+/* =========================================================
    DIÁLOGO - PROGRAMAR REUNIÓN
    ========================================================= */
 
@@ -108,6 +179,67 @@
 
 .chip__remove:hover {
   color: var(--color-danger);
+}
+
+.field--switch__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.field__hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+}
+
+.switch__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch__slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.switch__slider::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-surface);
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+}
+
+.switch__input:checked + .switch__slider {
+  background-color: var(--color-success);
+}
+
+.switch__input:checked + .switch__slider::before {
+  transform: translateX(18px);
+}
+
+.switch__input:focus-visible + .switch__slider {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .start-dialog__actions {

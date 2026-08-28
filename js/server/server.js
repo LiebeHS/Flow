@@ -1276,7 +1276,7 @@ app.get(
                            r.ReunionId
 
                     WHERE
-                        r.Estado = 'Programada'
+                        r.Estado IN ('Programada', 'En curso')
 
                     GROUP BY
                         r.ReunionId,
@@ -1337,6 +1337,16 @@ app.get(
    OBTENER TODOS LOS COMPROMISOS
    ========================================================= */
 
+const STATUS_A_ESTADO = {
+
+    1: "pendiente",
+    2: "en-progreso",
+    3: "completado",
+    4: "vencido"
+
+};
+
+
 app.get(
     "/api/compromisos",
     async (req, res) => {
@@ -1347,86 +1357,78 @@ app.get(
                 await db.execute(
                     `
                     SELECT
-                        rs.ReunionId,
-                        rs.Contenido,
+                        c.CompromisoId,
+                        c.Titulo,
+                        c.Descripcion,
+                        c.Prioridad,
+                        c.FechaInicioEstimada,
+                        c.FechaFinEstimada,
+                        c.Status,
+                        c.ReunionId,
                         r.Titulo AS ReunionTitulo,
-                        r.FechaInicio AS ReunionFechaInicio,
-                        r.Estado AS ReunionEstado
-                    FROM reunion_secciones rs
+                        r.FechaInicio AS ReunionFecha,
+                        u.nombre AS ResponsableNombre,
+                        CASE
+                            WHEN c.Status IN (1, 2)
+                                AND c.FechaFinEstimada IS NOT NULL
+                                AND c.FechaFinEstimada < NOW()
+                            THEN 4
+                            ELSE c.Status
+                        END AS StatusEfectivo
+                    FROM compromisos c
                     INNER JOIN reuniones r
-                        ON r.ReunionId = rs.ReunionId
+                        ON r.ReunionId = c.ReunionId
+                    INNER JOIN usuarios u
+                        ON u.id = c.UsuarioAsignadoId
                     WHERE
-                        rs.Seccion = 'compromisos'
-                        AND r.Estado <> 'Cancelada'
+                        r.Estado <> 'Cancelada'
+                    ORDER BY
+                        c.FechaFinEstimada ASC
                     `
                 );
 
 
             const compromisos =
-                rows.flatMap(
-                    row => {
+                rows.map(
+                    row => ({
 
-                        let contenido =
-                            row.Contenido;
+                        id:
+                            row.CompromisoId,
 
+                        descripcion:
+                            row.Descripcion ||
+                            row.Titulo,
 
-                        if (
-                            typeof contenido ===
-                            "string"
-                        ) {
+                        usuarioAsignadoNombre:
+                            row.ResponsableNombre,
 
-                            try {
+                        fechaInicio:
+                            row.FechaInicioEstimada,
 
-                                contenido =
-                                    JSON.parse(
-                                        contenido
-                                    );
+                        fechaLimite:
+                            row.FechaFinEstimada,
 
-                            }
-                            catch (error) {
+                        estado:
+                            STATUS_A_ESTADO[row.StatusEfectivo] ||
+                            "pendiente",
 
-                                console.error(
-                                    "ERROR PARSEANDO COMPROMISOS:",
-                                    error
-                                );
+                        estadoReal:
+                            STATUS_A_ESTADO[row.Status] ||
+                            "pendiente",
 
-                                contenido =
-                                    [];
+                        prioridad:
+                            row.Prioridad,
 
-                            }
+                        reunionId:
+                            row.ReunionId,
 
-                        }
+                        reunionTitulo:
+                            row.ReunionTitulo,
 
+                        reunionFecha:
+                            row.ReunionFecha
 
-                        if (
-                            !Array.isArray(
-                                contenido
-                            )
-                        ) {
-
-                            return [];
-
-                        }
-
-
-                        return contenido.map(
-                            compromiso => ({
-
-                                ...compromiso,
-
-                                reunionId:
-                                    row.ReunionId,
-
-                                reunionTitulo:
-                                    row.ReunionTitulo,
-
-                                reunionFecha:
-                                    row.ReunionFechaInicio
-
-                            })
-                        );
-
-                    }
+                    })
                 );
 
 
@@ -1456,6 +1458,149 @@ app.get(
 
                     mensaje:
                         "No fue posible obtener los compromisos.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ACTUALIZAR ESTADO / FECHA LÍMITE DE UN COMPROMISO
+   ========================================================= */
+
+/*
+ * Desde la vista global de compromisos solo se pueden editar
+ * estos dos campos. El resto (responsable, descripción, fecha
+ * de inicio, prioridad) se define al crear el compromiso
+ * dentro de la reunión y no se modifica aquí.
+ */
+
+app.patch(
+    "/api/compromisos/:id",
+    async (req, res) => {
+
+        try {
+
+            const compromisoId =
+                Number(
+                    req.params.id
+                );
+
+
+            if (!compromisoId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de compromiso no válido."
+
+                    });
+
+            }
+
+
+            const estado =
+                String(
+                    req.body.estado ||
+                    ""
+                ).trim();
+
+
+            const fechaLimite =
+                req.body.fechaLimite ||
+                null;
+
+
+            if (
+                !ESTADO_A_STATUS[estado]
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Estado de compromiso no válido."
+
+                    });
+
+            }
+
+
+            const [resultado] =
+                await db.execute(
+                    `
+                    UPDATE compromisos
+                    SET
+                        Status = ?,
+                        FechaFinEstimada = ?,
+                        FechaActualizacion = NOW()
+                    WHERE CompromisoId = ?
+                    `,
+                    [
+                        ESTADO_A_STATUS[estado],
+                        fechaLimite,
+                        compromisoId
+                    ]
+                );
+
+
+            if (
+                resultado.affectedRows === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Compromiso no encontrado."
+
+                    });
+
+            }
+
+
+            return res.json({
+
+                ok: true,
+
+                mensaje:
+                    "Compromiso actualizado correctamente."
+
+            });
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR AL ACTUALIZAR COMPROMISO:",
+                error
+            );
+
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible actualizar el compromiso.",
 
                     error:
                         error.message
@@ -1741,6 +1886,24 @@ app.put(
             );
 
 
+            /*
+             * Deja rastro en la reunión de que algo se
+             * modificó (relevante sobre todo para reuniones
+             * ya finalizadas que siguen editables ese día).
+             */
+
+            await db.execute(
+                `
+                UPDATE reuniones
+                SET FechaActualizacion = NOW()
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionId
+                ]
+            );
+
+
             return res.json({
 
                 ok: true,
@@ -1961,6 +2124,7 @@ app.get(
                         FechaFin,
                         Lugar,
                         Estado,
+                        FechaFinalizacion,
                         UsuarioCreadorId
                     FROM reuniones
                     WHERE ReunionId = ?
@@ -2064,12 +2228,288 @@ app.get(
 
 
 /* =========================================================
+   MIGRAR COMPROMISOS A LA TABLA COMPROMISOS
+   ========================================================= */
+
+/*
+ * Se ejecuta al finalizar una reunión. Los compromisos viven,
+ * mientras la reunión está activa, como JSON dentro de
+ * reunion_secciones (Seccion='compromisos'). Al terminar, se
+ * archivan como filas reales en la tabla `compromisos`.
+ *
+ * "Vencido" NO es un valor guardado en Status: se calcula al
+ * consultar (ver GET /api/compromisos), comparando la fecha
+ * límite contra la fecha actual.
+ */
+
+const ESTADO_A_STATUS = {
+
+    "pendiente": 1,
+    "en-progreso": 2,
+    "completado": 3
+
+};
+
+
+async function resolverDepartamentoArea(
+    connection,
+    usuarioAsignadoId
+) {
+
+    const [rows] =
+        await connection.execute(
+            `
+            SELECT
+                s.SubsidiaryId,
+                a.AreaId
+            FROM usuarios u
+            LEFT JOIN subsidiaries s
+                ON s.SubsidiaryName = u.departamento
+            LEFT JOIN areas a
+                ON a.AreaName = u.area
+                AND a.SubsidiaryId = s.SubsidiaryId
+            WHERE u.id = ?
+            LIMIT 1
+            `,
+            [
+                usuarioAsignadoId
+            ]
+        );
+
+
+    if (
+        rows.length === 0 ||
+        !rows[0].SubsidiaryId ||
+        !rows[0].AreaId
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        departamentoId:
+            rows[0].SubsidiaryId,
+
+        areaId:
+            rows[0].AreaId
+
+    };
+
+}
+
+
+async function insertarCompromiso(
+    connection,
+    reunionId,
+    compromiso
+) {
+
+    const usuarioAsignadoId =
+        Number(
+            compromiso.usuarioAsignadoId
+        );
+
+
+    if (!usuarioAsignadoId) {
+
+        console.warn(
+            `Compromiso sin usuarioAsignadoId válido en reunión ${reunionId}, se omite:`,
+            compromiso
+        );
+
+        return false;
+
+    }
+
+
+    const deptoArea =
+        await resolverDepartamentoArea(
+            connection,
+            usuarioAsignadoId
+        );
+
+
+    if (!deptoArea) {
+
+        console.warn(
+            `No fue posible resolver departamento/área para el usuario ${usuarioAsignadoId} (reunión ${reunionId}), se omite el compromiso.`
+        );
+
+        return false;
+
+    }
+
+
+    const descripcion =
+        String(
+            compromiso.descripcion ||
+            ""
+        ).trim();
+
+
+    const status =
+        ESTADO_A_STATUS[compromiso.estado] ||
+        1;
+
+
+    await connection.execute(
+        `
+        INSERT INTO compromisos
+        (
+            ReunionId,
+            Titulo,
+            Descripcion,
+            UsuarioAsignadoId,
+            DepartamentoId,
+            AreaId,
+            Prioridad,
+            FechaInicioEstimada,
+            FechaFinEstimada,
+            Status
+        )
+        VALUES
+        (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+        `,
+        [
+            reunionId,
+            descripcion.slice(0, 250) || "Compromiso",
+            descripcion || null,
+            usuarioAsignadoId,
+            deptoArea.departamentoId,
+            deptoArea.areaId,
+            compromiso.prioridad || "media",
+            compromiso.fechaInicio || null,
+            compromiso.fechaLimite || null,
+            status
+        ]
+    );
+
+
+    return true;
+
+}
+
+
+async function resincronizarCompromisos(
+    connection,
+    reunionId,
+    compromisos
+) {
+
+    await connection.execute(
+        `
+        DELETE FROM compromisos
+        WHERE ReunionId = ?
+        `,
+        [
+            reunionId
+        ]
+    );
+
+
+    for (const compromiso of compromisos) {
+
+        await insertarCompromiso(
+            connection,
+            reunionId,
+            compromiso
+        );
+
+    }
+
+}
+
+
+async function migrarCompromisosATabla(
+    connection,
+    reunionId
+) {
+
+    const [seccionRows] =
+        await connection.execute(
+            `
+            SELECT Contenido
+            FROM reunion_secciones
+            WHERE
+                ReunionId = ?
+                AND Seccion = 'compromisos'
+            LIMIT 1
+            `,
+            [
+                reunionId
+            ]
+        );
+
+
+    if (seccionRows.length === 0) {
+
+        return;
+
+    }
+
+
+    let contenido =
+        seccionRows[0].Contenido;
+
+
+    if (typeof contenido === "string") {
+
+        try {
+
+            contenido =
+                JSON.parse(
+                    contenido
+                );
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR PARSEANDO COMPROMISOS AL FINALIZAR:",
+                error
+            );
+
+            contenido = [];
+
+        }
+
+    }
+
+
+    if (!Array.isArray(contenido)) {
+
+        return;
+
+    }
+
+
+    for (const compromiso of contenido) {
+
+        await insertarCompromiso(
+            connection,
+            reunionId,
+            compromiso
+        );
+
+    }
+
+}
+
+
+/* =========================================================
    ACTUALIZAR ESTADO DE REUNIÓN
    ========================================================= */
 
 app.patch(
     "/api/reuniones/:id/estado",
     async (req, res) => {
+
+        let connection;
 
         try {
 
@@ -2132,19 +2572,59 @@ app.patch(
             }
 
 
-            await db.execute(
-                `
-                UPDATE reuniones
-                SET
-                    Estado = ?,
-                    FechaActualizacion = NOW()
-                WHERE ReunionId = ?
-                `,
-                [
-                    estado,
+            if (
+                estado === "Finalizada"
+            ) {
+
+                connection =
+                    await db.getConnection();
+
+
+                await connection.beginTransaction();
+
+
+                await migrarCompromisosATabla(
+                    connection,
                     reunionId
-                ]
-            );
+                );
+
+
+                await connection.execute(
+                    `
+                    UPDATE reuniones
+                    SET
+                        Estado = ?,
+                        FechaFinalizacion = COALESCE(FechaFinalizacion, NOW()),
+                        FechaActualizacion = NOW()
+                    WHERE ReunionId = ?
+                    `,
+                    [
+                        estado,
+                        reunionId
+                    ]
+                );
+
+
+                await connection.commit();
+
+            }
+            else {
+
+                await db.execute(
+                    `
+                    UPDATE reuniones
+                    SET
+                        Estado = ?,
+                        FechaActualizacion = NOW()
+                    WHERE ReunionId = ?
+                    `,
+                    [
+                        estado,
+                        reunionId
+                    ]
+                );
+
+            }
 
 
             return res.json({
@@ -2158,6 +2638,13 @@ app.patch(
 
         }
         catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+
+            }
+
 
             console.error(
                 "ERROR AL ACTUALIZAR ESTADO DE REUNIÓN:",
@@ -2178,6 +2665,196 @@ app.patch(
                         error.message
 
                 });
+
+        }
+        finally {
+
+            if (connection) {
+
+                connection.release();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RESINCRONIZAR COMPROMISOS DE UNA REUNIÓN FINALIZADA
+   ========================================================= */
+
+/*
+ * Solo aplica mientras la reunión sigue dentro de su ventana
+ * de edición (terminada el mismo día calendario). Se usa desde
+ * la vista de Archivo cuando esta editable: cada guardado de
+ * compromisos vuelve a reflejar el arreglo completo en la
+ * tabla `compromisos` (se borra y reinserta, ver
+ * resincronizarCompromisos).
+ */
+
+app.put(
+    "/api/reuniones/:id/compromisos",
+    async (req, res) => {
+
+        let connection;
+
+        try {
+
+            const reunionId =
+                Number(
+                    req.params.id
+                );
+
+
+            if (!reunionId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de reunión no válido."
+
+                    });
+
+            }
+
+
+            const compromisos =
+                Array.isArray(
+                    req.body.compromisos
+                )
+                    ? req.body.compromisos
+                    : [];
+
+
+            const [reuniones] =
+                await db.execute(
+                    `
+                    SELECT
+                        Estado,
+                        FechaFinalizacion
+                    FROM reuniones
+                    WHERE ReunionId = ?
+                    LIMIT 1
+                    `,
+                    [
+                        reunionId
+                    ]
+                );
+
+
+            if (reuniones.length === 0) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Reunión no encontrada."
+
+                    });
+
+            }
+
+
+            const reunion =
+                reuniones[0];
+
+
+            const finalizadaHoy =
+                reunion.Estado === "Finalizada" &&
+                reunion.FechaFinalizacion &&
+                new Date(reunion.FechaFinalizacion).toDateString() ===
+                    new Date().toDateString();
+
+
+            if (!finalizadaHoy) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "La ventana de edición para esta reunión ya cerró."
+
+                    });
+
+            }
+
+
+            connection =
+                await db.getConnection();
+
+
+            await connection.beginTransaction();
+
+
+            await resincronizarCompromisos(
+                connection,
+                reunionId,
+                compromisos
+            );
+
+
+            await connection.commit();
+
+
+            return res.json({
+
+                ok: true,
+
+                mensaje:
+                    "Compromisos actualizados correctamente."
+
+            });
+
+        }
+        catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+
+            }
+
+
+            console.error(
+                "ERROR AL RESINCRONIZAR COMPROMISOS:",
+                error
+            );
+
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible actualizar los compromisos.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+        finally {
+
+            if (connection) {
+
+                connection.release();
+
+            }
 
         }
 

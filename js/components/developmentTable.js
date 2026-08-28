@@ -1,4 +1,15 @@
 import { loadData, saveData } from "../services/storage.service.js";
+import { capitalizar } from "../utils/capitalize.js";
+import { agruparPorPrioridad } from "../utils/agruparPorPrioridad.js";
+
+/*
+ * "flow:compromiso-creado-desde-punto" es un evento global
+ * (document), y createDevelopmentTable() se vuelve a llamar
+ * una vez por cada reunión que se inicia en la misma pestaña.
+ * Sin este control, cada llamada dejaría su propio listener
+ * pegado a document, acumulando uno por reunión.
+ */
+let quitarListenerCompromisoDesdePunto = null;
 
 const TIPO_CLASS = {
   subtitulo: "development-block--subtitulo",
@@ -48,6 +59,18 @@ export function createDevelopmentTable({ container, storageKey }) {
     return AVANCE_CLASS.find((rango)=> valor <= rango.max).clase;
   }
 
+  function formatearFechaCreacion(fechaISO) {
+    if (!fechaISO) return "";
+
+    const d = new Date(fechaISO);
+    if (Number.isNaN(d.getTime())) return "";
+
+    const dia = String(d.getDate()).padStart(2, "0");
+    const mes = capitalizar(d.toLocaleDateString("es-MX", { month: "short" }));
+
+    return `${dia}/${mes}/${d.getFullYear()}`;
+  }
+
   function persist() {
     saveData(storageKey, contenidos);
   }
@@ -59,6 +82,11 @@ export function createDevelopmentTable({ container, storageKey }) {
 
   function addBlock(objetivoId, tipo, index = null) {
     const block = { id: crypto.randomUUID(), tipo, texto: "" };
+
+    if (tipo === "punto") {
+      block.fechaCreacion = new Date().toISOString();
+    }
+
     const blocks = getBlocks(objetivoId);
 
    if(index === null){
@@ -90,6 +118,22 @@ export function createDevelopmentTable({ container, storageKey }) {
     persist();
   }
 
+  function updateBlockPrioridad(objetivoId, blockId, valor) {
+    const blocks = getBlocks(objetivoId);
+    const block = blocks.find((b) => b.id === blockId);
+    if (block) block.prioridad = valor;
+
+    /*
+     * Reacomodar de inmediato: el bloque de actividades
+     * (subtítulo + sus puntos/párrafos) que tenga un punto
+     * de alta prioridad se va al principio de esta sección.
+     */
+    contenidos[objetivoId] = agruparPorPrioridad(blocks);
+
+    persist();
+    render();
+  }
+
   
   function createAddButton(tipo, label) {
     const btn = document.createElement("button");
@@ -108,10 +152,15 @@ export function createDevelopmentTable({ container, storageKey }) {
     wrapper.classList.add(TIPO_CLASS[block.tipo]);
     wrapper.dataset.blockId = block.id;
 
+    if (block.tipo === "punto" && block.prioridad) {
+      wrapper.classList.add("development-block--prioridad");
+    }
+
     if (block.tipo === "punto") {
       const bullet = document.createElement("span");
       bullet.classList.add("development-block__bullet");
       bullet.textContent = "•";
+      bullet.title = "Convertir esta actividad en compromiso";
       wrapper.appendChild(bullet);
     }
 
@@ -157,8 +206,23 @@ export function createDevelopmentTable({ container, storageKey }) {
     completeBtn.textContent = "✓";
     completeBtn.setAttribute("aria-label", "Marcar como completado (100%)");
 
-    progress.append(slider, track, value, completeBtn);
+    const priorityBtn = document.createElement("button");
+    priorityBtn.type = "button";
+    priorityBtn.classList.add("development-block__priority");
+    priorityBtn.classList.toggle("development-block__priority--active", Boolean(block.prioridad));
+    priorityBtn.textContent = "🚩";
+    priorityBtn.setAttribute("aria-pressed", String(Boolean(block.prioridad)));
+    priorityBtn.setAttribute("aria-label", "Marcar como alta prioridad");
+
+    progress.append(slider, track, value, completeBtn, priorityBtn);
     wrapper.appendChild(progress);
+
+    if (block.fechaCreacion) {
+      const fecha = document.createElement("span");
+      fecha.classList.add("development-block__fecha");
+      fecha.textContent = formatearFechaCreacion(block.fechaCreacion);
+      wrapper.appendChild(fecha);
+    }
   }
 
     const deleteBtn = document.createElement("button");
@@ -188,6 +252,25 @@ export function createDevelopmentTable({ container, storageKey }) {
 
   return btn;
 }
+
+  function createInfoIcon() {
+    const wrapper = document.createElement("span");
+    wrapper.classList.add("development__info");
+    wrapper.tabIndex = 0;
+
+    const icon = document.createElement("span");
+    icon.classList.add("development__info-icon");
+    icon.textContent = "i";
+    icon.setAttribute("aria-hidden", "true");
+
+    const panel = document.createElement("span");
+    panel.classList.add("development__info-panel");
+    panel.textContent =
+      'El botón de editar estructura sirve para añadir subtítulos, puntos y párrafos en cualquier sección del desarrollo de la reunión. Vuelve a hacer clic en el botón para desactivar el modo edición.';
+
+    wrapper.append(icon, panel);
+    return wrapper;
+  }
 
   function createRow(objetivo) {
     const row = document.createElement("div");
@@ -270,7 +353,7 @@ function createInsertButton(tipo, label, index) {
       const field = table.querySelector(
         `[data-block-id="${focusBlockId}"] .development-block__field`
       );
-      if (field) field.focus();
+      if (field) field.focus({ preventScroll: true });
       focusBlockId = null;
     }
   }
@@ -338,9 +421,57 @@ function createInsertButton(tipo, label, index) {
       return;
     }
 
-  
+    if (event.target.matches(".development-block__priority")) {
+      const block = event.target.closest(".development-block");
+      const nuevoValor = !block.classList.contains("development-block--prioridad");
+      updateBlockPrioridad(objetivoId, block.dataset.blockId, nuevoValor);
+      return;
+    }
 
   });
+
+  table.addEventListener("dblclick", (event) => {
+    if (!event.target.matches(".development-block__bullet")) return;
+
+    const block = event.target.closest(".development-block--punto");
+    if (!block) return;
+
+    const objetivoId = block.closest(".development__row")?.dataset.id;
+    const punto = getBlocks(objetivoId).find((b) => b.id === block.dataset.blockId);
+    if (!punto) return;
+
+    document.dispatchEvent(
+      new CustomEvent("flow:punto-a-compromiso", {
+        detail: {
+          descripcion: punto.texto,
+          objetivoId,
+          blockId: punto.id,
+        },
+      })
+    );
+  });
+
+  if (quitarListenerCompromisoDesdePunto) {
+    quitarListenerCompromisoDesdePunto();
+  }
+
+  function alCrearCompromisoDesdePunto(event) {
+    const { objetivoId, blockId } = event.detail || {};
+    if (!objetivoId || !blockId) return;
+
+    removeBlock(objetivoId, blockId);
+  }
+
+  document.addEventListener(
+    "flow:compromiso-creado-desde-punto",
+    alCrearCompromisoDesdePunto
+  );
+
+  quitarListenerCompromisoDesdePunto = () =>
+    document.removeEventListener(
+      "flow:compromiso-creado-desde-punto",
+      alCrearCompromisoDesdePunto
+    );
 
  table.addEventListener("input", (event) => {
   const row = event.target.closest(".development__row");
@@ -358,8 +489,13 @@ function createInsertButton(tipo, label, index) {
     refreshAvanceUI(block, valor);
   }
 });
-  const existente = container.querySelector(".development__edit-toggle");
+  const existente = container.querySelector(".development__topbar");
 if (existente) existente.remove();
-  container.insertBefore(createEditToggle(), table);
+
+  const topbar = document.createElement("div");
+  topbar.classList.add("development__topbar");
+  topbar.append(createEditToggle(), createInfoIcon());
+
+  container.insertBefore(topbar, table);
   return { setObjetivos, refreshTextAreas };
 }

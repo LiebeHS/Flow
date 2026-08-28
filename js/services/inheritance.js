@@ -2,7 +2,7 @@ import { loadData, saveData } from "./storage.service.js";
 
 const PENDIENTES_KEY = "flow.pendientes";
 
-export function heredarPendientes(nuevoId) {
+export function heredarPendientes(nuevoId, { heredarCompromisos = true } = {}) {
   const pendientes = loadData(PENDIENTES_KEY, null);
   if (!pendientes) return;
 
@@ -13,11 +13,13 @@ export function heredarPendientes(nuevoId) {
     done: false,
   }));
 
-  // 2. Compromisos: id nuevo
-  const compromisos = (pendientes.compromisos || []).map((c) => ({
-    ...c,
-    id: crypto.randomUUID(),
-  }));
+  // 2. Compromisos: id nuevo (solo si se decidió heredarlos)
+  const compromisos = heredarCompromisos
+    ? (pendientes.compromisos || []).map((c) => ({
+        ...c,
+        id: crypto.randomUUID(),
+      }))
+    : [];
 
   // 3. Mapa de objetivo viejo → nuevo (para reconectar el desarrollo)
   const mapaObjetivos = {};

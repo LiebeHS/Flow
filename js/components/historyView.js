@@ -324,6 +324,10 @@ export function createHistoryView({
             );
 
 
+        const enCurso =
+            reunion.Estado === "En curso";
+
+
         const badge =
             document.createElement(
                 "span"
@@ -332,12 +336,16 @@ export function createHistoryView({
 
         badge.classList.add(
             "history-card__badge",
-            "history-card__badge--programada"
+            enCurso
+                ? "history-card__badge--en-curso"
+                : "history-card__badge--programada"
         );
 
 
         badge.textContent =
-            "Programada";
+            enCurso
+                ? "En curso"
+                : "Programada";
 
 
         header.append(
@@ -432,7 +440,9 @@ export function createHistoryView({
 
 
         action.textContent =
-            "Clic para iniciar →";
+            enCurso
+                ? "Clic para continuar →"
+                : "Clic para iniciar →";
 
 
         /* ---------------------------------------------

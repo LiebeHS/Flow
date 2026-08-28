@@ -22,7 +22,10 @@ const vistas = {
         document.querySelector("#vista-compromisos"),
 
     archivo:
-        document.querySelector("#vista-archivo")
+        document.querySelector("#vista-archivo"),
+
+    permisos:
+        document.querySelector("#vista-permisos")
 
 };
 
@@ -40,6 +43,7 @@ const vistas = {
  * reunion
  * compromisos
  * archivo
+ * permisos
  */
 export function showView(nombre) {
 

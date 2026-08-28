@@ -38,6 +38,7 @@
 .development-block__bullet {
   color: var(--color-progress);
   line-height: 1.7;
+  cursor: pointer;
 }
 
 .development-block__field {
@@ -103,9 +104,15 @@
   color: var(--color-accent);
 }
 
+.development__topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
 .development__edit-toggle {
   align-self: flex-start;
-  margin-bottom: var(--space-md);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   color: var(--color-text-muted);
@@ -258,4 +265,91 @@
 
 .insert-zone__btn:hover {
   background-color: var(--color-surface-alt);
+}
+
+/* =========================================================
+   ÍCONO DE INFORMACIÓN
+   ========================================================= */
+
+.development__info {
+  position: relative;
+  display: inline-flex;
+  outline: none;
+}
+
+.development__info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-subtle);
+  font-size: 11px;
+  font-style: italic;
+  font-weight: var(--weight-bold);
+  cursor: help;
+}
+
+.development__info-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  width: 260px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.development__info:hover .development__info-panel,
+.development__info:focus-within .development__info-panel {
+  display: block;
+}
+
+/* =========================================================
+   FECHA DEL PUNTO
+   ========================================================= */
+
+.development-block__fecha {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   ALTA PRIORIDAD
+   ========================================================= */
+
+.development-block--prioridad {
+  border-left: 3px solid var(--color-danger);
+  padding-left: var(--space-xs);
+  margin-left: calc(var(--space-xs) * -1);
+}
+
+.development-block__priority {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  opacity: 0.4;
+  filter: grayscale(1);
+  transition: opacity var(--transition-fast), filter var(--transition-fast);
+}
+
+.development-block__priority:hover {
+  opacity: 0.8;
+}
+
+.development-block__priority--active {
+  opacity: 1;
+  filter: none;
 }

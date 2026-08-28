@@ -1,100 +1,64 @@
-const API_URL =
-    "http://localhost:3000/api";
+import { API_URL } from "./config.js";
 
 
 export function initUserEdit() {
 
     const form =
         document.querySelector(
-            "#form-editar-usuario"
+            "#editar-usuario-form"
         );
 
 
     if (!form) {
 
         console.warn(
-            "No se encontró #form-editar-usuario"
+            "No se encontró #editar-usuario-form"
         );
 
         return;
 
-    }
-
-
-
-    /* =====================================================
-       EVENTO: USUARIO SELECCIONADO PARA EDITAR
-       ===================================================== */
-
-    document.addEventListener(
-        "flow:editar-usuario",
-        function () {
-
-            cargarUsuario()
-                .catch(
-                    error => {
-
-                        console.error(
-                            "ERROR AL CARGAR USUARIO:",
-                            error
-                        );
-
-                    }
-                );
-
-        }
-    );
-
-
-    if (!form) {
-
-        console.warn(
-            "No se encontró #form-editar-usuario"
-        );
-
-        return;
     }
 
 
     const id =
         document.querySelector(
-            "#form-editar-usuario"
+            "#editar-usuario-id"
         );
 
 
     const nombre =
         document.querySelector(
-            "#editar-usuario-nombre"
+            "#editar-nombre"
         );
 
 
     const departamento =
         document.querySelector(
-            "#editar-usuario-departamento"
+            "#editar-departamento"
         );
 
 
     const area =
         document.querySelector(
-            "#editar-usuario-area"
+            "#editar-area"
         );
 
 
     const correo =
         document.querySelector(
-            "#editar-usuario-correo"
+            "#editar-correo"
         );
 
 
     const password =
         document.querySelector(
-            "#editar-usuario-password"
+            "#editar-password"
         );
 
 
     const passwordConfirmar =
         document.querySelector(
-            "#editar-usuario-password-confirmar"
+            "#editar-password-confirmacion"
         );
 
 
@@ -106,7 +70,7 @@ export function initUserEdit() {
 
     const botonGuardar =
         document.querySelector(
-            "#btn-guardar-edicion"
+            "#btn-guardar-usuario"
         );
 
 
@@ -341,18 +305,6 @@ export function initUserEdit() {
         "USER EDIT: usuario encontrado:",
         usuarioActual
     );
-
-
-        usuarioActual =
-            JSON.parse(
-                almacenado
-            );
-
-
-        console.log(
-            "Cargando usuario para edición:",
-            usuarioActual
-        );
 
 
         id.value =

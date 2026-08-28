@@ -218,6 +218,12 @@ export function initMeetingLifecycle({
         );
 
 
+    const heredarCompromisosInput =
+        dialog.querySelector(
+            "#input-heredar-compromisos"
+        );
+
+
     const btnPausar =
         document.querySelector(
             "#btn-pausar"
@@ -227,6 +233,12 @@ export function initMeetingLifecycle({
     const btnTerminar =
         document.querySelector(
             "#btn-terminar"
+        );
+
+
+    const menuConfiguracion =
+        document.querySelector(
+            ".settings-menu"
         );
 
 
@@ -1336,6 +1348,14 @@ export function initMeetingLifecycle({
         }
 
 
+        if (heredarCompromisosInput) {
+
+            heredarCompromisosInput.checked =
+                true;
+
+        }
+
+
         if (
             departamentoReunion
         ) {
@@ -1621,6 +1641,9 @@ export function initMeetingLifecycle({
             btnPausar.disabled =
                 !activa;
 
+            btnPausar.hidden =
+                !activa;
+
         }
 
 
@@ -1630,6 +1653,19 @@ export function initMeetingLifecycle({
 
             btnTerminar.disabled =
                 !activa;
+
+            btnTerminar.hidden =
+                !activa;
+
+        }
+
+
+        if (
+            menuConfiguracion
+        ) {
+
+            menuConfiguracion.hidden =
+                activa;
 
         }
 
@@ -2053,6 +2089,18 @@ catch (error) {
 
 
 /* =====================================================
+   GUARDAR PREFERENCIA DE HERENCIA
+   ===================================================== */
+
+saveData(
+    `flow.reunion-heredar.${reunionId}`,
+    heredarCompromisosInput
+        ? heredarCompromisosInput.checked
+        : true
+);
+
+
+/* =====================================================
    GUARDAR REUNIÓN ACTIVA
    ===================================================== */
 
@@ -2227,7 +2275,9 @@ async function iniciarReunionProgramada(
 
         const confirmado =
             await confirmDialog(
-                "¿Deseas iniciar esta reunión?"
+                data.reunion.Estado === "En curso"
+                    ? "¿Deseas continuar esta reunión?"
+                    : "¿Deseas iniciar esta reunión?"
             );
 
 
@@ -2372,8 +2422,19 @@ async function iniciarReunionProgramada(
            HEREDAR PENDIENTES
            ===================================================== */
 
+        const heredarCompromisos =
+            loadData(
+                `flow.reunion-heredar.${reunionId}`,
+                true
+            );
+
+
         heredarPendientes(
-            reunionId
+            reunionId,
+            {
+                heredarCompromisos:
+                    heredarCompromisos
+            }
         );
 
 

@@ -14,6 +14,34 @@ import {
     API_URL
 } from "./config.js";
 
+import {
+    cargarSeccionesDesdeBD
+} from "../services/storage.service.js";
+
+import {
+    reiniciarContenedor
+} from "../utils/reiniciarContenedor.js";
+
+import {
+    createEditableList
+} from "./editableList.js";
+
+import {
+    createDevelopmentTable
+} from "./developmentTable.js";
+
+import {
+    createCommitmentList
+} from "./commitmentList.js";
+
+import {
+    createTextSection
+} from "./textSection.js";
+
+import {
+    createLinkList
+} from "./linkList.js";
+
 
 let reunionActual =
     null;
@@ -49,6 +77,18 @@ export function createArchiveView() {
     const content =
         document.querySelector(
             "#archive-content"
+        );
+
+
+    const editableContainer =
+        document.querySelector(
+            "#archive-editable"
+        );
+
+
+    const readonlyLabel =
+        document.querySelector(
+            "#archive-readonly-label"
         );
 
 
@@ -479,6 +519,241 @@ export function createArchiveView() {
 
 
     /* =========================================================
+       ¿SIGUE EDITABLE?
+       ========================================================= */
+
+    /*
+     * Una reunión finalizada se puede seguir editando desde
+     * aquí mientras dure el día calendario (hora local) en que
+     * se dio clic en "Terminar". Después de ese día, vuelve a
+     * ser de solo lectura.
+     */
+
+    function esEditable(
+        reunion
+    ) {
+
+        if (
+            reunion.Estado !== "Finalizada" ||
+            !reunion.FechaFinalizacion
+        ) {
+
+            return false;
+
+        }
+
+
+        const finalizada =
+            new Date(
+                reunion.FechaFinalizacion
+            );
+
+        const hoy =
+            new Date();
+
+
+        return (
+            finalizada.toDateString() ===
+            hoy.toDateString()
+        );
+
+    }
+
+
+    /* =========================================================
+       MONTAR MODO EDITABLE
+       ========================================================= */
+
+    async function montarModoEditable(
+        reunionId
+    ) {
+
+        /*
+         * Refrescar caché/localStorage con lo último de la
+         * base de datos antes de montar los componentes (los
+         * cuales leen de ahí a través de loadData/saveData).
+         */
+
+        await cargarSeccionesDesdeBD(
+            reunionId
+        );
+
+
+        const claveSeccion =
+            (seccion) =>
+                `flow.reunion.${reunionId}.${seccion}`;
+
+
+        const developmentTable =
+            createDevelopmentTable({
+
+                container:
+                    reiniciarContenedor(
+                        "#archive-desarrollo"
+                    ),
+
+                storageKey:
+                    claveSeccion(
+                        "desarrollo"
+                    )
+
+            });
+
+
+        createEditableList({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-objetivos"
+                ),
+
+            itemName:
+                "objetivo",
+
+            storageKey:
+                claveSeccion(
+                    "objetivos"
+                ),
+
+            onChange:
+                (objetivos) => {
+
+                    developmentTable.setObjetivos(
+                        objetivos
+                    );
+
+                }
+
+        });
+
+
+        createEditableList({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-asuntos"
+                ),
+
+            itemName:
+                "asunto",
+
+            storageKey:
+                claveSeccion(
+                    "asuntos"
+                )
+
+        });
+
+
+        createCommitmentList({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-compromisos"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "compromisos"
+                ),
+
+            sincronizarTabla: {
+                reunionId
+            }
+
+        });
+
+
+        createTextSection({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-otros"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "otros"
+                ),
+
+            placeholder:
+                "Otros asuntos tratados…"
+
+        });
+
+
+        createTextSection({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-competitividad"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "competitividad"
+                ),
+
+            placeholder:
+                "Notas sobre competitividad…"
+
+        });
+
+
+        createTextSection({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-acuerdos"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "acuerdos"
+                ),
+
+            placeholder:
+                "Acuerdos…"
+
+        });
+
+
+        createTextSection({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-reflexion"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "reflexion"
+                ),
+
+            placeholder:
+                "Reflexión grupal de la reunión…"
+
+        });
+
+
+        createLinkList({
+
+            container:
+                reiniciarContenedor(
+                    "#archive-enlaces"
+                ),
+
+            storageKey:
+                claveSeccion(
+                    "enlaces"
+                )
+
+        });
+
+    }
+
+
+    /* =========================================================
        RENDER
        ========================================================= */
 
@@ -567,6 +842,65 @@ export function createArchiveView() {
                 "SECCIONES:",
                 s
             );
+
+
+            /* =============================================
+               ¿SIGUE EDITABLE?
+               ============================================= */
+
+            const editable =
+                esEditable(
+                    reunion
+                );
+
+
+            if (
+                readonlyLabel
+            ) {
+
+                readonlyLabel.textContent =
+                    editable
+                        ? "Reunión terminada hoy · aún editable"
+                        : "Reunión archivada · solo lectura";
+
+            }
+
+
+            if (
+                editable
+            ) {
+
+                if (content) {
+                    content.hidden = true;
+                }
+
+                if (editableContainer) {
+                    editableContainer.hidden = false;
+                }
+
+
+                await montarModoEditable(
+                    id
+                );
+
+
+                showView(
+                    "archivo"
+                );
+
+
+                return;
+
+            }
+
+
+            if (content) {
+                content.hidden = false;
+            }
+
+            if (editableContainer) {
+                editableContainer.hidden = true;
+            }
 
 
             /* =============================================
@@ -696,16 +1030,19 @@ export function createArchiveView() {
                     compromiso => {
 
                         const colaboradores =
-                            Array.isArray(
-                                compromiso.colaboradores
-                            )
-                                ? compromiso.colaboradores.join(
-                                    ", "
+                            compromiso.usuarioAsignadoNombre ||
+                            (
+                                Array.isArray(
+                                    compromiso.colaboradores
                                 )
-                                : (
-                                    compromiso.colaboradores ||
-                                    ""
-                                );
+                                    ? compromiso.colaboradores.join(
+                                        ", "
+                                    )
+                                    : (
+                                        compromiso.colaboradores ||
+                                        ""
+                                    )
+                            );
 
 
                         const estado =

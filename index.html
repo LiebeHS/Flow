@@ -79,6 +79,62 @@
                 Terminar
             </button>
 
+            <div class="settings-menu">
+
+                <button
+                    type="button"
+                    id="btn-configuracion"
+                    class="app-header__btn app-header__settings"
+                    aria-label="Configuración"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="3"
+                        ></circle>
+
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                        ></path>
+
+                    </svg>
+
+                </button>
+
+                <div
+                    class="settings-menu__panel"
+                    id="settings-menu-panel"
+                    hidden
+                >
+
+                    <button
+                        type="button"
+                        class="settings-menu__item"
+                        data-view="usuarios"
+                    >
+                        Control de Usuarios
+                    </button>
+
+                    <button
+                        type="button"
+                        class="settings-menu__item"
+                        data-view="permisos"
+                    >
+                        Permisos
+                    </button>
+
+                </div>
+
+            </div>
+
             <button
                 type="button"
                 id="btn-cerrar-sesion"
@@ -199,58 +255,6 @@
 
                         <span class="dashboard-card__description">
                             Consulta reuniones anteriores y sus resultados.
-                        </span>
-
-                    </button>
-
-
-                    <!-- =========================================
-                         CONTROL DE USUARIOS
-                         ========================================= -->
-
-                    <button
-                        type="button"
-                        class="dashboard-card dashboard-card--users"
-                        data-view="usuarios"
-                    >
-
-                        <span class="dashboard-card__icon">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                            >
-
-                                <circle
-                                    cx="9"
-                                    cy="8"
-                                    r="3"
-                                ></circle>
-
-                                <path
-                                    d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"
-                                ></path>
-
-                                <path
-                                    d="M16 11c2.2 0 4 1.8 4 4"
-                                ></path>
-
-                                <path
-                                    d="M17 20h4"
-                                ></path>
-
-                            </svg>
-
-                        </span>
-
-
-                        <span class="dashboard-card__title">
-                            Control de Usuarios
-                        </span>
-
-
-                        <span class="dashboard-card__description">
-                            Administra los usuarios y accesos de Flow.
                         </span>
 
                     </button>
@@ -1082,7 +1086,7 @@
 
                 <button
                     type="submit"
-                    id="btn-guardar-usuario"
+                    id="btn-registrar-usuario"
                     class="users-view__add"
                 >
                     Registrar usuario
@@ -1320,16 +1324,20 @@
                             <label class="field">
 
                                 <span class="field__label">
-                                    Colaboradores
+                                    Responsable
                                 </span>
 
-                                <input
-                                    type="text"
-                                    name="colaboradores"
-                                    class="field__input"
-                                    placeholder="Ana, Luis, María"
+                                <select
+                                    name="usuarioAsignadoId"
+                                    class="field__input commitment-list__usuarios"
                                     required
                                 >
+
+                                    <option value="">
+                                        Seleccione un responsable
+                                    </option>
+
+                                </select>
 
                             </label>
 
@@ -1362,6 +1370,7 @@
                                         type="date"
                                         name="fechaInicio"
                                         class="field__input"
+                                        required
                                     >
 
                                 </label>
@@ -1377,6 +1386,7 @@
                                         type="date"
                                         name="fechaLimite"
                                         class="field__input"
+                                        required
                                     >
 
                                 </label>
@@ -1686,6 +1696,10 @@
                                     Completado
                                 </option>
 
+                                <option value="vencido">
+                                    Vencido
+                                </option>
+
                                 <option value="todos">
                                     Todos
                                 </option>
@@ -1730,7 +1744,7 @@
     </button>
 
 
-    <span class="archive__readonly-label">
+    <span class="archive__readonly-label" id="archive-readonly-label">
         Reunión archivada · solo lectura
     </span>
 
@@ -1749,6 +1763,430 @@
                 class="archive__content"
                 id="archive-content"
             ></div>
+
+
+            <!-- =============================================
+                 CONTENIDO EDITABLE (REUNIÓN TERMINADA EL
+                 MISMO DÍA) — mismas secciones que la reunión
+                 en vivo, con IDs propios para no chocar con
+                 #vista-reunion.
+                 ============================================= -->
+
+            <div
+                class="archive__editable meeting__body"
+                id="archive-editable"
+                hidden
+            >
+
+                <section
+                    class="meeting-section"
+                    id="archive-objetivos"
+                    aria-labelledby="archive-objetivos-title"
+                >
+
+                    <h2 id="archive-objetivos-title">
+                        Objetivos de la reunión
+                    </h2>
+
+                    <p class="editable-list__counter"></p>
+
+                    <ul class="editable-list__list"></ul>
+
+
+                    <div class="editable-list__form">
+
+                        <input
+                            type="text"
+                            class="editable-list__input"
+                            placeholder="Nuevo objetivo..."
+                            aria-label="Escribe aquí tu objetivo"
+                        >
+
+                        <button
+                            type="button"
+                            class="editable-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-asuntos"
+                    aria-labelledby="archive-asuntos-title"
+                >
+
+                    <h2 id="archive-asuntos-title">
+                        Asuntos generales
+                    </h2>
+
+                    <p class="editable-list__counter"></p>
+
+                    <ul class="editable-list__list"></ul>
+
+
+                    <div class="editable-list__form">
+
+                        <input
+                            type="text"
+                            class="editable-list__input"
+                            placeholder="Nuevo asunto..."
+                            aria-label="Escribe tu asunto"
+                        >
+
+                        <button
+                            type="button"
+                            class="editable-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-desarrollo"
+                    aria-labelledby="archive-desarrollo-title"
+                >
+
+                    <h2 id="archive-desarrollo-title">
+                        Desarrollo de la reunión
+                    </h2>
+
+                    <div class="development__table"></div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-compromisos"
+                    aria-labelledby="archive-compromisos-title"
+                >
+
+                    <h2 id="archive-compromisos-title">
+                        Compromisos
+                    </h2>
+
+                    <ul class="commitment-list__list"></ul>
+
+
+                    <button
+                        type="button"
+                        class="commitment-list__add"
+                    >
+                        + Nuevo compromiso
+                    </button>
+
+
+                    <dialog class="commitment-list__dialog">
+
+                        <form class="commitment-list__form">
+
+                            <h3 class="commitment-list__form-title">
+                                Nuevo compromiso
+                            </h3>
+
+
+                            <label class="field">
+
+                                <span class="field__label">
+                                    Responsable
+                                </span>
+
+                                <select
+                                    name="usuarioAsignadoId"
+                                    class="field__input commitment-list__usuarios"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Seleccione un responsable
+                                    </option>
+
+                                </select>
+
+                            </label>
+
+
+                            <label class="field">
+
+                                <span class="field__label">
+                                    Descripción
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="descripcion"
+                                    class="field__input"
+                                    required
+                                >
+
+                            </label>
+
+
+                            <div class="field-row">
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Fecha de inicio
+                                    </span>
+
+                                    <input
+                                        type="date"
+                                        name="fechaInicio"
+                                        class="field__input"
+                                        required
+                                    >
+
+                                </label>
+
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Fecha límite
+                                    </span>
+
+                                    <input
+                                        type="date"
+                                        name="fechaLimite"
+                                        class="field__input"
+                                        required
+                                    >
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="field-row">
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Estado
+                                    </span>
+
+                                    <select
+                                        name="estado"
+                                        class="field__input"
+                                    >
+
+                                        <option value="pendiente">
+                                            Pendiente
+                                        </option>
+
+                                        <option value="en-progreso">
+                                            En progreso
+                                        </option>
+
+                                        <option value="completado">
+                                            Completado
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+
+                                <label class="field">
+
+                                    <span class="field__label">
+                                        Prioridad
+                                    </span>
+
+                                    <select
+                                        name="prioridad"
+                                        class="field__input"
+                                    >
+
+                                        <option value="alta">
+                                            Alta
+                                        </option>
+
+                                        <option value="media">
+                                            Media
+                                        </option>
+
+                                        <option value="baja">
+                                            Baja
+                                        </option>
+
+                                    </select>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="commitment-list__form-actions">
+
+                                <button
+                                    type="button"
+                                    class="commitment-list__cancel"
+                                >
+                                    Cancelar
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="commitment-list__save"
+                                >
+                                    Guardar
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </dialog>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-otros"
+                    aria-labelledby="archive-otros-title"
+                >
+
+                    <h2 id="archive-otros-title">
+                        Otros Asuntos
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-competitividad"
+                    aria-labelledby="archive-competitividad-title"
+                >
+
+                    <h2 id="archive-competitividad-title">
+                        Competitividad
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-acuerdos"
+                    aria-labelledby="archive-acuerdos-title"
+                >
+
+                    <h2 id="archive-acuerdos-title">
+                        Acuerdos
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-enlaces"
+                    aria-labelledby="archive-enlaces-title"
+                >
+
+                    <h2 id="archive-enlaces-title">
+                        Enlaces
+                    </h2>
+
+                    <ul class="link-list__list"></ul>
+
+
+                    <div class="link-list__form">
+
+                        <input
+                            type="text"
+                            class="link-list__title"
+                            placeholder="Título del enlace"
+                            aria-label="Título del enlace"
+                        >
+
+                        <input
+                            type="url"
+                            class="link-list__url"
+                            placeholder="https://..."
+                            aria-label="URL del enlace"
+                        >
+
+                        <button
+                            type="button"
+                            class="link-list__add"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <section
+                    class="meeting-section"
+                    id="archive-reflexion"
+                    aria-labelledby="archive-reflexion-title"
+                >
+
+                    <h2 id="archive-reflexion-title">
+                        Reflexión Grupal
+                    </h2>
+
+                    <div class="text-section"></div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VISTA DE PERMISOS
+             ===================================================== -->
+
+        <section
+            id="vista-permisos"
+            class="view view--hidden"
+        >
+
+            <div class="view__navigation">
+
+                <button
+                    type="button"
+                    class="view__back"
+                    data-view="dashboard"
+                >
+                    ← Volver al inicio
+                </button>
+
+            </div>
+
+
+            <h1 class="view__title">
+                Permisos
+            </h1>
+
+            <p class="commitments-view__subtitle">
+                Esta sección estará disponible cuando el catálogo de permisos esté listo en la base de datos.
+            </p>
 
         </section>
 
@@ -1770,14 +2208,14 @@
                 type="button"
                 class="confirm-dialog__cancel"
             >
-                Cancelar
+                No
             </button>
 
             <button
                 type="button"
                 class="confirm-dialog__accept"
             >
-                Aceptar
+                Sí
             </button>
 
         </div>
@@ -2054,6 +2492,40 @@
         </div>
 
 
+        <!-- =================================================
+             HEREDAR COMPROMISOS
+             ================================================= -->
+
+        <div class="field field--switch">
+
+            <div class="field--switch__row">
+
+                <span class="field__label">
+                    Heredar compromisos pendientes
+                </span>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="input-heredar-compromisos"
+                        class="switch__input"
+                        checked
+                    >
+
+                    <span class="switch__slider"></span>
+
+                </label>
+
+            </div>
+
+            <span class="field__hint">
+                Si al iniciar esta reunión existen compromisos pendientes de la anterior, se agregarán automáticamente.
+            </span>
+
+        </div>
+
+
  <!-- =================================================
              ACCIONES
              ================================================= -->
@@ -2090,6 +2562,7 @@
     <script
         type="module"
         src="js/main.js"
+        
     ></script>
 
 </body>
