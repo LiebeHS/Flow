@@ -1215,6 +1215,13 @@ export function createArchiveView() {
             "click",
             () => {
 
+                document.dispatchEvent(
+                    new CustomEvent(
+                        "flow:volver-historial"
+                    )
+                );
+
+
                 showView(
                     "historial"
                 );

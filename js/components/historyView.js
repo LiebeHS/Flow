@@ -1078,6 +1078,16 @@ export function createHistoryView({
     );
 
 
+    document.addEventListener(
+        "flow:volver-historial",
+        () => {
+
+            render();
+
+        }
+    );
+
+
     /* =========================================================
        API PÚBLICA
        ========================================================= */

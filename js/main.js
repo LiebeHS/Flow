@@ -180,6 +180,15 @@ function inicializarNavegacion() {
         }
 
 
+        if (
+            vista === "historial"
+        ) {
+
+            historyView.render();
+
+        }
+
+
         showView(
             vista
         );
