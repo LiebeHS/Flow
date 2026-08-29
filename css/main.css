@@ -56,13 +56,8 @@
 
 body {
 
-    background:
-        linear-gradient(
-            135deg,
-            #e8f6fc 0%,
-            #dff3fb 50%,
-            #f5fbfe 100%
-        );
+    background-color:
+        var(--color-bg);
 
     color:
         var(--color-text);

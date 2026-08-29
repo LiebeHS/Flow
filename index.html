@@ -2303,50 +2303,50 @@
 
 
         <!-- =================================================
-             DEPARTAMENTO
+             DEPARTAMENTO Y ÁREA
              ================================================= -->
 
-        <div class="meeting-field">
+        <div class="field-row">
 
-            <label for="reunion-departamento">
-                Departamento
+            <label class="field">
+
+                <span class="field__label">
+                    Departamento
+                </span>
+
+                <select
+                    id="reunion-departamento"
+                    class="field__input"
+                >
+
+                    <option value="">
+                        Seleccione un departamento
+                    </option>
+
+                </select>
+
             </label>
 
-            <select
-                id="reunion-departamento"
-                class="meeting-select"
-            >
 
-                <option value="">
-                    Seleccione un departamento
-                </option>
+            <label class="field">
 
-            </select>
+                <span class="field__label">
+                    Área
+                </span>
 
-        </div>
+                <select
+                    id="reunion-area"
+                    class="field__input"
+                    disabled
+                >
 
+                    <option value="">
+                        Seleccione primero un departamento
+                    </option>
 
-        <!-- =================================================
-             ÁREA
-             ================================================= -->
+                </select>
 
-        <div class="meeting-field">
-
-            <label for="reunion-area">
-                Área
             </label>
-
-            <select
-                id="reunion-area"
-                class="meeting-select"
-                disabled
-            >
-
-                <option value="">
-                    Seleccione primero un departamento
-                </option>
-
-            </select>
 
         </div>
 

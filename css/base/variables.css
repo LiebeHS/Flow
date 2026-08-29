@@ -17,6 +17,14 @@
     --color-accent-hover: #00476b;/*color cuando se hace hover sobre algún elemento*/
     --color-on-accent: #ffffff; /*texto sobre el acento*/
 
+    /*Escala navy para superficies de acento*/
+    --color-accent-900: #002236;
+    --color-accent-800: #003049; /*igual a --color-accent*/
+    --color-accent-700: #00476b; /*igual a --color-accent-hover*/
+    --color-accent-600: #005b85;
+    --color-accent-500: #00719e;
+    --color-accent-400: #007cae;  
+
     /*Colores: estados, alertas, progreso*/
     --color-danger: #D62828;
     --color-warning: #fcbf49;

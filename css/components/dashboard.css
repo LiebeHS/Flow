@@ -1,12 +1,29 @@
 /* =========================================================
    FLOW - DASHBOARD
+   ---------------------------------------------------------
+   Refactor Opción A: familia navy.
+   Todos los valores provienen de css/base/variables.css.
+   No debe existir ningún hex literal en este archivo,
+   salvo los blancos translúcidos de la decoración.
+   ========================================================= */
+
+
+/* =========================================================
+   CONTENEDOR
    ========================================================= */
 
 .dashboard {
     width: 100%;
+
     max-width: 1400px;
+
     margin: 0 auto;
-    padding: 35px 30px 50px;
+
+    padding:
+        var(--space-xl)
+        var(--space-lg)
+        var(--space-2xl);
+
     box-sizing: border-box;
 }
 
@@ -16,29 +33,32 @@
    ========================================================= */
 
 .dashboard__header {
-    margin-bottom: 35px;
+    margin-bottom: var(--space-xl);
 }
+
 
 .dashboard__title {
     margin: 0;
 
-    font-size: 32px;
-    font-weight: 700;
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
 
     line-height: 1.2;
 
-    color: var(--color-text);
-
     letter-spacing: -0.5px;
+
+    color: var(--color-text);
 }
 
-.dashboard__subtitle {
-    margin: 8px 0 0;
 
-    font-size: 15px;
+.dashboard__subtitle {
+    margin: var(--space-xs) 0 0;
+
+    font-size: var(--text-base);
+
     line-height: 1.5;
 
-    color: #7c8494;
+    color: var(--color-text-second);
 }
 
 
@@ -52,7 +72,7 @@
     grid-template-columns:
         repeat(4, minmax(0, 1fr));
 
-    gap: 30px;
+    gap: var(--space-lg);
 
     width: 100%;
 }
@@ -60,6 +80,10 @@
 
 /* =========================================================
    TARJETA
+   ---------------------------------------------------------
+   El icono ya NO va en position: absolute.
+   Va en el flujo normal, así el título nunca
+   se encima aunque ocupe dos líneas.
    ========================================================= */
 
 .dashboard-card {
@@ -68,16 +92,20 @@
     display: flex;
     flex-direction: column;
 
-    justify-content: flex-end;
+    align-items: center;
 
-    min-height: 190px;
+    gap: var(--space-md);
 
-    padding: 25px 28px;
+    min-height: 200px;
+
+    padding:
+        var(--space-lg)
+        var(--space-md);
 
     box-sizing: border-box;
 
     border: none;
-    border-radius: 9px;
+    border-radius: var(--radius-md);
 
     overflow: hidden;
 
@@ -87,21 +115,24 @@
 
     font-family: inherit;
 
-    text-align: left;
+    text-align: center;
 
-    color: #ffffff;
+    color: var(--color-on-accent);
 
-    box-shadow:
-        0 5px 15px rgba(30, 40, 70, 0.10);
+    box-shadow: var(--shadow-md);
 
     transition:
-        transform 0.22s ease,
-        box-shadow 0.22s ease;
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 
 /* =========================================================
    DECORACIÓN DE FONDO
+   ---------------------------------------------------------
+   Velos blancos muy sutiles sobre el navy.
+   Se conservan del diseño original: aportan
+   profundidad sin introducir color nuevo.
    ========================================================= */
 
 .dashboard-card::before {
@@ -109,16 +140,15 @@
 
     position: absolute;
 
-    width: 270px;
-    height: 270px;
-
     top: -150px;
     left: -80px;
 
+    width: 270px;
+    height: 270px;
+
     border-radius: 50%;
 
-    background:
-        rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.08);
 
     transform: rotate(20deg);
 
@@ -131,16 +161,15 @@
 
     position: absolute;
 
-    width: 330px;
-    height: 150px;
-
     top: -10px;
     right: -150px;
 
+    width: 330px;
+    height: 150px;
+
     border-radius: 50%;
 
-    background:
-        rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);
 
     transform: rotate(-15deg);
 
@@ -149,14 +178,13 @@
 
 
 /* =========================================================
-   HOVER
+   ESTADOS
    ========================================================= */
 
 .dashboard-card:hover {
     transform: translateY(-5px);
 
-    box-shadow:
-        0 12px 25px rgba(30, 40, 70, 0.18);
+    box-shadow: var(--shadow-lg);
 }
 
 
@@ -165,15 +193,12 @@
 }
 
 
-/* =========================================================
-   FOCUS
-   ========================================================= */
-
 .dashboard-card:focus-visible {
     outline:
-        3px solid rgba(60, 110, 220, 0.35);
+        3px solid
+        var(--color-accent-700);
 
-    outline-offset: 4px;
+    outline-offset: 3px;
 }
 
 
@@ -182,39 +207,33 @@
    ========================================================= */
 
 .dashboard-card__icon {
-    position: absolute;
-
-    top: 33px;
-    left: 50%;
-
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    width: 92px;
-    height: 92px;
+    flex-shrink: 0;
+
+    width: 84px;
+    height: 84px;
 
     border-radius: 50%;
 
-    background: #ffffff;
+    background: var(--color-surface);
 
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.08);
-
-    transform: translateX(-50%);
+    box-shadow: var(--shadow-sm);
 
     z-index: 2;
 
     transition:
-        transform 0.22s ease,
-        box-shadow 0.22s ease;
+        transform var(--transition-base),
+        box-shadow var(--transition-base);
 }
 
 
 .dashboard-card__icon svg {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
 
     fill: none;
 
@@ -230,17 +249,17 @@
 .dashboard-card:hover
 .dashboard-card__icon {
 
-    transform:
-        translateX(-50%)
-        scale(1.04);
+    transform: scale(1.04);
 
-    box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
 }
 
 
 /* =========================================================
-   INFORMACIÓN
+   TÍTULO
+   ---------------------------------------------------------
+   margin-top: auto empuja el título al fondo
+   de la tarjeta sin sacarlo del flujo.
    ========================================================= */
 
 .dashboard-card__title {
@@ -248,78 +267,80 @@
 
     display: block;
 
-    margin: 0;
+    margin: auto 0 0;
 
     z-index: 3;
 
-    font-size: 17px;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
 
-    font-weight: 700;
+    line-height: 1.25;
 
-    line-height: 1.2;
-
-    color: #ffffff;
+    color: var(--color-on-accent);
 }
 
 
 /* =========================================================
    DESCRIPCIÓN
+   ---------------------------------------------------------
+   Visible en hover Y en focus por teclado.
    ========================================================= */
 
 .dashboard-card__description {
     position: absolute;
 
     left: 50%;
-    bottom: 52px;
+    bottom: var(--space-2xl);
 
-    width: calc(100% - 36px);
+    width: calc(100% - var(--space-xl));
 
-    padding: 12px 15px;
+    padding:
+        var(--space-sm)
+        var(--space-md);
 
     box-sizing: border-box;
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
-    background:
-        rgba(255, 255, 255, 0.97);
+    background: var(--color-surface);
 
-    color: #4f5665;
+    color: var(--color-text-second);
 
-    font-size: 12px;
+    font-size: var(--text-xs);
 
     line-height: 1.4;
 
     text-align: center;
 
-    box-shadow:
-        0 8px 18px rgba(0, 0, 0, 0.14);
+    box-shadow: var(--shadow-lg);
 
     opacity: 0;
     visibility: hidden;
 
     pointer-events: none;
 
-    transform:
-        translate(-50%, 10px);
+    transform: translate(-50%, 10px);
 
     transition:
-        opacity 0.2s ease,
-        transform 0.2s ease,
-        visibility 0.2s ease;
+        opacity var(--transition-base),
+        transform var(--transition-base),
+        visibility var(--transition-base);
 
     z-index: 10;
 }
 
 
 .dashboard-card:hover
+.dashboard-card__description,
+
+.dashboard-card:focus-visible
 .dashboard-card__description {
 
     opacity: 1;
 
     visibility: visible;
 
-    transform:
-        translate(-50%, 0);
+    transform: translate(-50%, 0);
 }
 
 
@@ -330,23 +351,21 @@
 .dashboard-card__indicator {
     position: absolute;
 
-    right: 22px;
-    bottom: 18px;
+    right: var(--space-lg);
+    bottom: var(--space-md);
 
     display: flex;
 
     align-items: center;
 
-    gap: 5px;
+    gap: var(--space-2xs);
 
     z-index: 3;
 
-    font-size: 14px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
 
-    font-weight: 600;
-
-    color:
-        rgba(255, 255, 255, 0.90);
+    color: rgba(255, 255, 255, 0.90);
 }
 
 
@@ -358,8 +377,7 @@
 
     border-radius: 50%;
 
-    background:
-        rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.75);
 
     box-shadow:
         0 0 0 2px
@@ -369,8 +387,171 @@
 
 /* =========================================================
    COLORES DE TARJETAS
+   ---------------------------------------------------------
+   Una sola familia navy en cuatro profundidades.
+   La jerarquía va de la acción principal (más
+   oscura, más peso visual) a la secundaria.
+
+   Contraste del texto blanco sobre cada tono:
+   900 → 14:1   |   700 → 9.9:1
+   600 → 6.7:1  |   400 → 4.7:1
+   Todos por encima del mínimo AA.
    ========================================================= */
 
+/* ---------------------------------------------------------
+   PROGRAMAR REUNIÓN — acción principal
+   --------------------------------------------------------- */
+
+.dashboard-card--primary {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-accent-700) 0%,
+            var(--color-accent-900) 100%
+        );
+}
+
+.dashboard-card--primary
+.dashboard-card__icon {
+    color: var(--color-accent-800);
+}
+
+
+/* ---------------------------------------------------------
+   HISTORIAL
+   --------------------------------------------------------- */
+
+.dashboard-card--history {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-accent-600) 0%,
+            var(--color-accent-800) 100%
+        );
+}
+
+.dashboard-card--history
+.dashboard-card__icon {
+    color: var(--color-accent-700);
+}
+
+
+/* ---------------------------------------------------------
+   COMPROMISOS
+   --------------------------------------------------------- */
+
+.dashboard-card--commitments {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-accent-500) 0%,
+            var(--color-accent-700) 100%
+        );
+}
+
+.dashboard-card--commitments
+.dashboard-card__icon {
+    color: var(--color-accent-600);
+}
+
+
+/* ---------------------------------------------------------
+   CONTROL DE USUARIOS
+   --------------------------------------------------------- */
+
+.dashboard-card--users {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-accent-400) 0%,
+            var(--color-accent-600) 100%
+        );
+}
+
+.dashboard-card--users
+.dashboard-card__icon {
+    color: var(--color-accent-500);
+}
+
+
+/* =========================================================
+   RESPONSIVE - LAPTOP
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .dashboard__grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: var(--space-lg);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .dashboard {
+        padding:
+            var(--space-lg)
+            var(--space-md)
+            var(--space-xl);
+    }
+
+
+    .dashboard__header {
+        margin-bottom: var(--space-lg);
+    }
+
+
+    .dashboard__title {
+        font-size: var(--text-xl);
+    }
+
+
+    .dashboard__grid {
+        grid-template-columns: 1fr;
+
+        gap: var(--space-md);
+    }
+
+
+    .dashboard-card {
+        min-height: 185px;
+    }
+
+}
+
+
+/* =========================================================
+   MOVIMIENTO REDUCIDO
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dashboard-card,
+    .dashboard-card__icon,
+    .dashboard-card__description {
+        transition: none;
+    }
+
+
+    .dashboard-card:hover {
+        transform: none;
+    }
+
+
+    .dashboard-card:hover
+    .dashboard-card__icon {
+        transform: none;
+    }
+
+}
 /* ---------------------------------------------------------
    HISTORIAL
    --------------------------------------------------------- */
