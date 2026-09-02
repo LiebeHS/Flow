@@ -363,6 +363,52 @@
 
                     </button>
 
+
+                    <!-- =========================================
+                         INNOVACIONES
+                         ========================================= -->
+
+                    <button
+                        type="button"
+                        class="dashboard-card dashboard-card--innovations"
+                        data-view="innovaciones"
+                    >
+
+                        <span class="dashboard-card__icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <path
+                                    d="M9 18h6"
+                                ></path>
+
+                                <path
+                                    d="M10 21h4"
+                                ></path>
+
+                                <path
+                                    d="M12 3a6 6 0 0 0-4 10.5c.6.55 1 1.32 1 2.15V16h6v-.35c0-.83.4-1.6 1-2.15A6 6 0 0 0 12 3z"
+                                ></path>
+
+                            </svg>
+
+                        </span>
+
+
+                        <span class="dashboard-card__title">
+                            Innovaciones
+                        </span>
+
+
+                        <span class="dashboard-card__description">
+                            Acciones, ideas o mejoras implementadas para optimizar procesos.
+                        </span>
+
+                    </button>
+
                 </div>
 
             </div>
@@ -1718,6 +1764,507 @@
                     </p>
 
                 </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VISTA DE INNOVACIONES
+             ===================================================== -->
+
+        <section
+            id="vista-innovaciones"
+            class="view view--hidden"
+        >
+
+            <div class="view__navigation">
+
+                <button
+                    type="button"
+                    class="view__back"
+                    data-view="dashboard"
+                >
+                    ← Volver al inicio
+                </button>
+
+            </div>
+
+
+            <div class="innovation-form-view">
+
+                <header class="innovation-form-view__header">
+
+                    <div>
+
+                        <h1 class="view__title">
+                            Innovaciones
+                        </h1>
+
+                        <p class="innovation-form-view__subtitle">
+                            Acciones, ideas o mejoras implementadas para optimizar procesos y generar mayor valor en las actividades del área.
+                        </p>
+
+                    </div>
+
+                </header>
+
+
+                <form
+                    id="form-innovacion"
+                    class="innovation-form"
+                    novalidate
+                >
+
+                    <div
+                        class="innovation-form__toast"
+                        role="status"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <!-- =============================================
+                         DATOS GENERALES
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <legend class="innovation-form__section-title">
+                            Datos Generales
+                        </legend>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-area">
+                                Área de Trabajo
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <select
+                                id="innovacion-area"
+                                required
+                            >
+
+                                <option value="">
+                                    -Select-
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="innovation-form__row">
+
+                            <div class="form-group">
+
+                                <label for="innovacion-responsable-nombre">
+                                    Responsable de la innovación
+                                    <span class="innovation-form__required">*</span>
+                                </label>
+
+                                <input
+                                    id="innovacion-responsable-nombre"
+                                    type="text"
+                                    placeholder="Nombre"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="innovacion-responsable-apellido">
+                                    &nbsp;
+                                </label>
+
+                                <input
+                                    id="innovacion-responsable-apellido"
+                                    type="text"
+                                    placeholder="Apellido"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-nombre">
+                                Nombre de la innovación
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-nombre"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-actividad">
+                                Actividad a la que impacta
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-actividad"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-servicio">
+                                Servicio relacionado
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-servicio"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <!-- =============================================
+                         DESARROLLO
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <legend class="innovation-form__section-title">
+                            Desarrollo
+                        </legend>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-problematica">
+                                Problemática o área de oportunidad
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-problematica"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                            <p class="innovation-form__hint">
+                                Situación o condición que afecta el desempeño de la organización y requiere atención o solución.
+                            </p>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-objetivo">
+                                Objetivo
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-objetivo"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                            <p class="innovation-form__hint">
+                                Resultado específico que la organización busca alcanzar en un plazo determinado (¿Qué se quiere lograr?).
+                            </p>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-estrategia">
+                                Estrategia
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-estrategia"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                            <p class="innovation-form__hint">
+                                Plan de acción diseñado para que la organización alcance sus objetivos (¿Cómo se va a lograr?).
+                            </p>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-debilidad">
+                                Debilidad
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-debilidad"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                            <p class="innovation-form__hint">
+                                Factor interno que limita el desempeño de la organización o dificulta el logro de sus objetivos (¿Qué nos limita?)
+                            </p>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <!-- =============================================
+                         PLAN DE TRABAJO
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <legend class="innovation-form__section-title">
+                            Plan de Trabajo
+                        </legend>
+
+                        <p class="innovation-form__hint">
+                            Conjunto de actividades organizadas para alcanzar un objetivo.
+                        </p>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-accion-1">
+                                Acción 1
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-accion-1"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-accion-2">
+                                Acción 2
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-accion-2"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-accion-3">
+                                Acción 3
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-accion-3"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-accion-4">
+                                Acción 4
+                            </label>
+
+                            <textarea
+                                id="innovacion-accion-4"
+                                rows="3"
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-accion-5">
+                                Acción 5
+                            </label>
+
+                            <textarea
+                                id="innovacion-accion-5"
+                                rows="3"
+                            ></textarea>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <!-- =============================================
+                         VALOR PRESENTE NETO
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <legend class="innovation-form__section-title">
+                            Valor Presente Neto
+                        </legend>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-vpn-archivo">
+                                Subir Formato VPN (Adjuntar Formato Excel)
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <input
+                                id="innovacion-vpn-archivo"
+                                type="file"
+                                accept=".xls,.xlsx"
+                                required
+                            >
+
+                            <p class="innovation-form__hint">
+                                El valor presente (VPN) es una herramienta de evaluación financiera a largo plazo, con el cuál se calcula la viabilidad de un proyecto.
+                            </p>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <!-- =============================================
+                         EVIDENCIAS
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <legend class="innovation-form__section-title">
+                            Evidencias
+                        </legend>
+
+                        <p class="innovation-form__hint">
+                            Información o prueba que demuestra el cumplimiento de una actividad, proceso u objetivo dentro de la organización.
+                        </p>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-evidencia-archivo">
+                                Evidencia Archivo
+                            </label>
+
+                            <input
+                                id="innovacion-evidencia-archivo"
+                                type="file"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                            >
+
+                            <p class="innovation-form__hint">
+                                Adjuntar archivos que respalden la innovación (PDF, Word (.docx), Excel (.xlsx))
+                            </p>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="innovacion-evidencia-imagenes">
+                                Evidencia Imagen
+                            </label>
+
+                            <input
+                                id="innovacion-evidencia-imagenes"
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.gif"
+                                multiple
+                            >
+
+                            <p class="innovation-form__hint">
+                                Adjuntar imágenes que respalden la innovación (JPG, JPEG, PNG, GIF)
+                            </p>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <!-- =============================================
+                         JUSTIFICACIÓN DE LA VALUACIÓN
+                         ============================================= -->
+
+                    <fieldset class="innovation-form__section">
+
+                        <div class="form-group">
+
+                            <label for="innovacion-justificacion">
+                                Justificación de la Valuación
+                                <span class="innovation-form__required">*</span>
+                            </label>
+
+                            <textarea
+                                id="innovacion-justificacion"
+                                rows="3"
+                                required
+                            ></textarea>
+
+                            <p class="innovation-form__hint">
+                                Es la prueba y explicación que describe por qué se han considerado de esa manera inversión, tal beneficio y costo.
+                            </p>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <p
+                        class="innovation-form__feedback"
+                        hidden
+                    ></p>
+
+
+                    <div class="innovation-form__actions">
+
+                        <button
+                            type="submit"
+                            class="innovation-form__submit"
+                        >
+                            Enviar
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 

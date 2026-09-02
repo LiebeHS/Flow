@@ -71,6 +71,10 @@ import {
 } from "./components/commitmentsView.js";
 
 import {
+    initInnovationForm
+} from "./components/innovationForm.js";
+
+import {
     initSettingsMenu
 } from "./components/settingsMenu.js";
 
@@ -1068,6 +1072,13 @@ initUserEdit();
 
 const commitmentsView =
     initCommitmentsView();
+
+
+/* =========================================================
+   FORMULARIO DE INNOVACIONES
+   ========================================================= */
+
+initInnovationForm();
 
 
 /* =========================================================

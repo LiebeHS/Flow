@@ -10,6 +10,14 @@ import {
     API_URL
 } from "./config.js";
 
+import {
+    confirmDialog
+} from "../services/confirmDialog.js";
+
+import {
+    getReunionActivaId
+} from "../services/session.js";
+
 
 /* =========================================================
    CREAR VISTA DE HISTORIAL
@@ -265,6 +273,130 @@ export function createHistoryView({
 
 
     /* =========================================================
+       ELIMINAR REUNIÓN
+       ========================================================= */
+
+    async function eliminarReunion(
+        reunionId
+    ) {
+
+        if (
+            reunionId ===
+            getReunionActivaId()
+        ) {
+
+            alert(
+                "No puedes eliminar la reunión que está en curso."
+            );
+
+            return;
+
+        }
+
+
+        const confirmado =
+            await confirmDialog(
+                "¿Eliminar esta reunión? Se borrará junto con sus objetivos, compromisos y participantes. Esta acción no se puede deshacer."
+            );
+
+        if (!confirmado) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/reuniones/${reunionId}`,
+                    {
+
+                        method:
+                            "DELETE"
+
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.mensaje ||
+                    data.error ||
+                    "No fue posible eliminar la reunión."
+                );
+
+            }
+
+
+            await render();
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR ELIMINANDO REUNIÓN:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "No fue posible eliminar la reunión."
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       BOTÓN ELIMINAR
+       ========================================================= */
+
+    function crearBotonEliminar(
+        reunionId
+    ) {
+
+        const boton =
+            document.createElement(
+                "button"
+            );
+
+        boton.type =
+            "button";
+
+        boton.classList.add(
+            "history-card__delete"
+        );
+
+        boton.dataset.reunionId =
+            reunionId;
+
+        boton.setAttribute(
+            "aria-label",
+            "Eliminar reunión"
+        );
+
+        boton.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="4,7 20,7"></polyline>
+                <path d="M9 7V4h6v3"></path>
+                <path d="M6 7l1 13h10l1-13"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        `;
+
+        return boton;
+
+    }
+
+
+    /* =========================================================
        CARD - REUNIÓN PROGRAMADA
        ========================================================= */
 
@@ -350,7 +482,10 @@ export function createHistoryView({
 
         header.append(
             fecha,
-            badge
+            badge,
+            crearBotonEliminar(
+                reunion.ReunionId
+            )
         );
 
 
@@ -597,7 +732,10 @@ export function createHistoryView({
 
         header.append(
             fecha,
-            badge
+            badge,
+            crearBotonEliminar(
+                reunion.ReunionId
+            )
         );
 
 
@@ -858,12 +996,8 @@ export function createHistoryView({
                 [...programadas]
                     .sort(
                         (a, b) =>
-                            new Date(
-                                a.FechaInicio
-                            ) -
-                            new Date(
-                                b.FechaInicio
-                            )
+                            b.ReunionId -
+                            a.ReunionId
                     )
                     .map(
                         crearTarjetaProgramada
@@ -962,6 +1096,45 @@ export function createHistoryView({
     list.addEventListener(
         "click",
         (event) => {
+
+            /* ---------------------------------------------
+               ELIMINAR
+               --------------------------------------------- */
+
+            const botonEliminar =
+                event.target.closest(
+                    ".history-card__delete"
+                );
+
+
+            if (
+                botonEliminar
+            ) {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+
+                const id =
+                    Number(
+                        botonEliminar.dataset.reunionId
+                    );
+
+
+                if (id) {
+
+                    eliminarReunion(
+                        id
+                    );
+
+                }
+
+
+                return;
+
+            }
+
 
             /* ---------------------------------------------
                REUNIÓN PROGRAMADA

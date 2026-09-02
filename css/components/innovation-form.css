@@ -1,0 +1,357 @@
+/* =========================================================
+   FLOW - FORMULARIO DE INNOVACIONES
+   ========================================================= */
+
+
+/* =========================================================
+   SUBTÍTULO
+   ========================================================= */
+
+.innovation-form-view__subtitle {
+    margin: 8px 0 0;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+    color: var(--color-text-subtle);
+}
+
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.innovation-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: var(--space-lg);
+
+    width: 100%;
+    max-width: 900px;
+
+    margin: var(--space-lg) auto 0;
+}
+
+
+/* =========================================================
+   SECCIÓN (TARJETA)
+   ========================================================= */
+
+.innovation-form__section {
+    display: flex;
+    flex-direction: column;
+
+    gap: var(--space-md);
+
+    margin: 0;
+    padding: var(--space-lg);
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-surface);
+
+    box-shadow: var(--shadow-sm);
+}
+
+
+.innovation-form__section-title {
+    padding: 0 0 var(--space-xs);
+
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+
+    color: var(--color-text);
+}
+
+
+/* =========================================================
+   FILAS DE DOS COLUMNAS (NOMBRE / APELLIDO)
+   ========================================================= */
+
+.innovation-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: var(--space-md);
+}
+
+
+/* =========================================================
+   GRUPOS DE CAMPO
+   ========================================================= */
+
+.innovation-form .form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: var(--space-2xs);
+}
+
+
+.innovation-form .form-group label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+
+    color: var(--color-text);
+}
+
+
+.innovation-form__required {
+    color: var(--color-danger);
+}
+
+
+/* =========================================================
+   TEXTO DE AYUDA
+   ========================================================= */
+
+.innovation-form__hint {
+    margin: 0;
+
+    font-size: var(--text-xs);
+
+    line-height: 1.5;
+
+    color: var(--color-text-subtle);
+}
+
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
+
+.innovation-form input[type="text"],
+.innovation-form select,
+.innovation-form textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: var(--space-xs) var(--space-sm);
+
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-surface);
+
+    color: var(--color-text);
+
+    font-family: inherit;
+    font-size: var(--text-sm);
+
+    outline: none;
+
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+
+.innovation-form input[type="text"] {
+    height: 40px;
+}
+
+
+.innovation-form select {
+    height: 40px;
+
+    cursor: pointer;
+}
+
+
+.innovation-form textarea {
+    resize: vertical;
+}
+
+
+.innovation-form input[type="text"]:focus,
+.innovation-form select:focus,
+.innovation-form textarea:focus {
+    border-color: var(--color-accent-500);
+
+    box-shadow:
+        0 0 0 3px rgba(0, 113, 158, 0.15);
+}
+
+
+.innovation-form input[type="file"] {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: var(--space-xs) var(--space-sm);
+
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-surface-alt);
+
+    color: var(--color-text-second);
+
+    font-family: inherit;
+    font-size: var(--text-sm);
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   RETROALIMENTACIÓN
+   ========================================================= */
+
+.innovation-form__feedback {
+    margin: 0;
+
+    padding: var(--space-sm) var(--space-md);
+
+    border-radius: var(--radius-sm);
+
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+
+.innovation-form__feedback--success {
+    background: var(--color-success-bg);
+
+    color: var(--color-succes-text);
+}
+
+
+.innovation-form__feedback--error {
+    background: #fde7e7;
+
+    color: #a14d4d;
+}
+
+
+/* =========================================================
+   AVISO TEMPORAL (TOAST)
+   ========================================================= */
+
+.innovation-form__toast {
+    position: fixed;
+
+    left: 50%;
+    bottom: var(--space-xl);
+
+    max-width: calc(100% - var(--space-xl));
+
+    padding: var(--space-sm) var(--space-lg);
+
+    box-sizing: border-box;
+
+    border-radius: var(--radius-md);
+
+    background: var(--color-success-bg);
+
+    color: var(--color-succes-text);
+
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+
+    text-align: center;
+
+    box-shadow: var(--shadow-lg);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transform: translate(-50%, 12px);
+
+    transition:
+        opacity var(--transition-base),
+        transform var(--transition-base);
+
+    z-index: 1000;
+}
+
+
+.innovation-form__toast--visible {
+    opacity: 1;
+
+    transform: translate(-50%, 0);
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.innovation-form__actions {
+    display: flex;
+    justify-content: center;
+}
+
+
+.innovation-form__submit {
+    min-width: 160px;
+    height: 44px;
+
+    padding: 0 var(--space-lg);
+
+    border: none;
+    border-radius: var(--radius-lg);
+
+    background: var(--color-warning);
+
+    color: var(--color-text);
+
+    font-family: inherit;
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 12px rgba(252, 191, 73, 0.35);
+
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        filter var(--transition-fast);
+}
+
+
+.innovation-form__submit:hover {
+    filter: brightness(1.04);
+
+    transform: translateY(-2px);
+}
+
+
+.innovation-form__submit:active {
+    transform: translateY(0);
+}
+
+
+.innovation-form__submit:disabled {
+    opacity: 0.6;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .innovation-form__row {
+        grid-template-columns: 1fr;
+    }
+
+    .innovation-form__section {
+        padding: var(--space-md);
+    }
+
+}

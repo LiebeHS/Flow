@@ -456,6 +456,25 @@
 
 
 /* ---------------------------------------------------------
+   INNOVACIONES
+   --------------------------------------------------------- */
+
+.dashboard-card--innovations {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-warning) 0%,
+            var(--color-progress) 100%
+        );
+}
+
+.dashboard-card--innovations
+.dashboard-card__icon {
+    color: var(--color-progress);
+}
+
+
+/* ---------------------------------------------------------
    CONTROL DE USUARIOS
    --------------------------------------------------------- */
 

@@ -21,6 +21,9 @@ const vistas = {
     compromisos:
         document.querySelector("#vista-compromisos"),
 
+    innovaciones:
+        document.querySelector("#vista-innovaciones"),
+
     archivo:
         document.querySelector("#vista-archivo"),
 
@@ -42,6 +45,7 @@ const vistas = {
  * editarUsuario
  * reunion
  * compromisos
+ * innovaciones
  * archivo
  * permisos
  */

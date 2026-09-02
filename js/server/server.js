@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const multer = require("multer");
 
 const db = require("./db");
 
@@ -48,6 +50,29 @@ app.use(
 app.use(
     express.json()
 );
+
+
+/* =========================================================
+   ARCHIVOS SUBIDOS (INNOVACIONES)
+   ---------------------------------------------------------
+   Se guardan como BLOB en MySQL (tabla innovacion_archivos)
+   en vez de en disco: así son visibles desde cualquier
+   máquina, ya que todos comparten el mismo MySQL pero cada
+   quien corre su propio backend local.
+   ========================================================= */
+
+const uploadInnovacion =
+    multer({
+
+        storage:
+            multer.memoryStorage(),
+
+        limits: {
+            fileSize:
+                15 * 1024 * 1024
+        }
+
+    });
 
 
 /* =========================================================
@@ -835,38 +860,30 @@ app.get(
                 );
 
 
-            if (
-                !subsidiaryId
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        mensaje:
-                            "Debe especificar el departamento."
-
-                    });
-
-            }
-
-
             const [rows] =
-                await db.execute(
-                    `
-                    SELECT
-                        AreaId,
-                        AreaName
-                    FROM areas
-                    WHERE SubsidiaryId = ?
-                    ORDER BY AreaName
-                    `,
-                    [
-                        subsidiaryId
-                    ]
-                );
+                subsidiaryId ?
+                    await db.execute(
+                        `
+                        SELECT
+                            AreaId,
+                            AreaName
+                        FROM areas
+                        WHERE SubsidiaryId = ?
+                        ORDER BY AreaName
+                        `,
+                        [
+                            subsidiaryId
+                        ]
+                    ) :
+                    await db.execute(
+                        `
+                        SELECT
+                            AreaId,
+                            AreaName
+                        FROM areas
+                        ORDER BY AreaName
+                        `
+                    );
 
 
             return res.json({
@@ -1080,7 +1097,8 @@ app.post(
                 fechaFin,
                 lugar,
                 estado,
-                usuarioCreadorId
+                usuarioCreadorId,
+                heredarCompromisos
             } = req.body;
 
             console.log(
@@ -1149,10 +1167,12 @@ console.log(
                         FechaFin,
                         Lugar,
                         Estado,
-                        UsuarioCreadorId
+                        UsuarioCreadorId,
+                        HeredarCompromisos
                     )
                     VALUES
                     (
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -1183,7 +1203,11 @@ console.log(
 
                         Number(
                             usuarioCreadorId
-                        )
+                        ),
+
+                        heredarCompromisos === false
+                            ? 0
+                            : 1
 
                     ]
                 );
@@ -2682,6 +2706,686 @@ app.patch(
 
 
 /* =========================================================
+   HEREDAR PENDIENTES A LA SIGUIENTE REUNIÓN
+   ========================================================= */
+
+/*
+ * Al terminar una reunión, sus objetivos y compromisos que
+ * quedaron sin completar (y el desarrollo asociado a esos
+ * objetivos) se pueden pasar automáticamente a la siguiente
+ * reunión que se inicie. Esto se calcula y se guarda aquí,
+ * en el servidor, para que funcione sin importar en qué
+ * computadora se programó/finalizó/inició cada reunión (antes
+ * dependía de localStorage del navegador, que no se comparte
+ * entre compañeros).
+ *
+ * "PendientesConsumidos" marca la reunión de origen para que
+ * sus pendientes no se vuelvan a heredar una segunda vez si
+ * se inician varias reuniones seguidas.
+ */
+
+function agruparPorPrioridad(
+    bloques
+) {
+
+    const grupos =
+        [];
+
+    let actual = {
+
+        subtitulo:
+            null,
+
+        items:
+            []
+
+    };
+
+
+    bloques.forEach(
+        (bloque) => {
+
+            if (
+                bloque.tipo === "subtitulo"
+            ) {
+
+                grupos.push(
+                    actual
+                );
+
+                actual = {
+
+                    subtitulo:
+                        bloque,
+
+                    items:
+                        []
+
+                };
+
+            }
+            else {
+
+                actual.items.push(
+                    bloque
+                );
+
+            }
+
+        }
+    );
+
+    grupos.push(
+        actual
+    );
+
+
+    const esPrioritario =
+        (bloque) =>
+            bloque.tipo === "punto" &&
+            bloque.prioridad;
+
+
+    return grupos.flatMap(
+        (grupo) => {
+
+            const prioritarios =
+                grupo.items.filter(
+                    esPrioritario
+                );
+
+            const normales =
+                grupo.items.filter(
+                    (bloque) =>
+                        !esPrioritario(bloque)
+                );
+
+            const itemsOrdenados = [
+                ...prioritarios,
+                ...normales
+            ];
+
+            return grupo.subtitulo
+                ? [grupo.subtitulo, ...itemsOrdenados]
+                : itemsOrdenados;
+
+        }
+    );
+
+}
+
+
+function contenidoDeSeccion(
+    filas,
+    seccion,
+    fallback
+) {
+
+    const fila =
+        filas.find(
+            (f) =>
+                f.Seccion === seccion
+        );
+
+    if (!fila) {
+
+        return fallback;
+
+    }
+
+
+    return typeof fila.Contenido === "string"
+        ? JSON.parse(fila.Contenido)
+        : fila.Contenido;
+
+}
+
+
+async function guardarSeccionReunion(
+    connection,
+    reunionId,
+    seccion,
+    contenido
+) {
+
+    await connection.execute(
+        `
+        INSERT INTO reunion_secciones
+        (
+            ReunionId,
+            Seccion,
+            Contenido
+        )
+        VALUES
+        (
+            ?, ?, ?
+        )
+        ON DUPLICATE KEY UPDATE
+            Contenido = VALUES(Contenido),
+            FechaActualizacion = CURRENT_TIMESTAMP
+        `,
+        [
+            reunionId,
+            seccion,
+            JSON.stringify(contenido)
+        ]
+    );
+
+}
+
+
+/*
+ * Compatibilidad con compromisos guardados antes del cambio de
+ * esquema, cuando se guardaba "colaboradores": [nombre] en vez
+ * de usuarioAsignadoId. Solo existen en un puñado de reuniones
+ * viejas (anteriores a la migración a la tabla `compromisos`);
+ * los compromisos nuevos siempre traen usuarioAsignadoId desde
+ * el formulario. Sin esto, esos compromisos se heredan sin
+ * responsable (aparecen con "?" en la tarjeta).
+ */
+const NOMBRE_LEGACY_A_USUARIO_ID = {
+
+    "Adán Bustamante": 1,
+    "Juan Carlos Alcaraz Huerta": 3,
+    "Marcos Soliz": 7,
+    "Carlos Alcaraz": 3
+
+};
+
+
+app.post(
+    "/api/reuniones/:id/heredar-pendientes",
+    async (req, res) => {
+
+        let connection;
+
+        try {
+
+            const reunionId =
+                Number(
+                    req.params.id
+                );
+
+
+            if (!reunionId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de reunión no válido."
+
+                    });
+
+            }
+
+
+            connection =
+                await db.getConnection();
+
+            await connection.beginTransaction();
+
+
+            /* =================================================
+               REUNIÓN DESTINO (para saber si quiere compromisos)
+               ================================================= */
+
+            const [
+                destinoRows
+            ] =
+                await connection.execute(
+                    `
+                    SELECT HeredarCompromisos
+                    FROM reuniones
+                    WHERE ReunionId = ?
+                    LIMIT 1
+                    `,
+                    [
+                        reunionId
+                    ]
+                );
+
+
+            if (destinoRows.length === 0) {
+
+                await connection.rollback();
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "La reunión no existe."
+
+                    });
+
+            }
+
+
+            const heredarCompromisos =
+                Number(
+                    destinoRows[0].HeredarCompromisos
+                ) === 1;
+
+
+            /* =================================================
+               REUNIÓN ORIGEN: la última finalizada sin heredar
+               ================================================= */
+
+            const [
+                origenRows
+            ] =
+                await connection.execute(
+                    `
+                    SELECT ReunionId, FechaInicio
+                    FROM reuniones
+                    WHERE
+                        Estado = 'Finalizada'
+                        AND PendientesConsumidos = 0
+                    ORDER BY
+                        FechaInicio DESC
+                    LIMIT 1
+                    `
+                );
+
+
+            if (origenRows.length === 0) {
+
+                await connection.commit();
+
+                return res.json({
+
+                    ok: true,
+
+                    aplicado:
+                        false
+
+                });
+
+            }
+
+
+            const reunionOrigenId =
+                origenRows[0].ReunionId;
+
+            const reunionOrigenFecha =
+                origenRows[0].FechaInicio;
+
+
+            const [
+                seccionRows
+            ] =
+                await connection.execute(
+                    `
+                    SELECT Seccion, Contenido
+                    FROM reunion_secciones
+                    WHERE
+                        ReunionId = ?
+                        AND Seccion IN ('objetivos', 'compromisos', 'desarrollo')
+                    `,
+                    [
+                        reunionOrigenId
+                    ]
+                );
+
+
+            const objetivos =
+                contenidoDeSeccion(
+                    seccionRows,
+                    "objetivos",
+                    []
+                );
+
+            const compromisos =
+                contenidoDeSeccion(
+                    seccionRows,
+                    "compromisos",
+                    []
+                );
+
+            const desarrollo =
+                contenidoDeSeccion(
+                    seccionRows,
+                    "desarrollo",
+                    {}
+                );
+
+
+            /* =================================================
+               OBJETIVOS PENDIENTES (con id nuevo)
+               ================================================= */
+
+            const objetivosViejosPendientes =
+                (
+                    Array.isArray(objetivos)
+                        ? objetivos
+                        : []
+                ).filter(
+                    (objetivo) =>
+                        !objetivo.done
+                );
+
+
+            const mapaObjetivos =
+                {};
+
+            const objetivosNuevos =
+                objetivosViejosPendientes.map(
+                    (objetivo) => {
+
+                        const nuevoId =
+                            crypto.randomUUID();
+
+                        mapaObjetivos[objetivo.id] =
+                            nuevoId;
+
+                        return {
+
+                            id:
+                                nuevoId,
+
+                            texto:
+                                objetivo.texto,
+
+                            done:
+                                false
+
+                        };
+
+                    }
+                );
+
+
+            /* =================================================
+               COMPROMISOS PENDIENTES (con id nuevo)
+               ================================================= */
+
+            const compromisosNuevos =
+                [];
+
+            const compromisosOrigen =
+                heredarCompromisos
+                    ? (
+                        Array.isArray(compromisos)
+                            ? compromisos
+                            : []
+                    ).filter(
+                        (compromiso) =>
+                            compromiso.estado !== "completado" &&
+                            !compromiso.vencidoInformativo
+                    )
+                    : [];
+
+
+            for (const compromiso of compromisosOrigen) {
+
+                const vencido =
+                    compromiso.fechaLimite &&
+                    new Date(compromiso.fechaLimite) < new Date();
+
+
+                let usuarioAsignadoId =
+                    compromiso.usuarioAsignadoId;
+
+                let usuarioAsignadoNombre =
+                    compromiso.usuarioAsignadoNombre;
+
+
+                if (
+                    !usuarioAsignadoId &&
+                    compromiso.colaboradores?.[0]
+                ) {
+
+                    const idLegacy =
+                        NOMBRE_LEGACY_A_USUARIO_ID[
+                            compromiso.colaboradores[0]
+                        ];
+
+                    if (idLegacy) {
+
+                        const [
+                            usuarioRows
+                        ] =
+                            await connection.execute(
+                                `
+                                SELECT id, nombre
+                                FROM usuarios
+                                WHERE id = ?
+                                LIMIT 1
+                                `,
+                                [
+                                    idLegacy
+                                ]
+                            );
+
+                        if (usuarioRows.length > 0) {
+
+                            usuarioAsignadoId =
+                                usuarioRows[0].id;
+
+                            usuarioAsignadoNombre =
+                                usuarioRows[0].nombre;
+
+                        }
+
+                    }
+
+                }
+
+
+                compromisosNuevos.push({
+
+                    ...compromiso,
+
+                    id:
+                        crypto.randomUUID(),
+
+                    usuarioAsignadoId:
+                        usuarioAsignadoId,
+
+                    usuarioAsignadoNombre:
+                        usuarioAsignadoNombre,
+
+                    ...(
+                        vencido
+                            ? { vencidoInformativo: true }
+                            : {}
+                    )
+
+                });
+
+            }
+
+
+            /* =================================================
+               DESARROLLO PENDIENTE (bloques al 100% se quitan)
+               ================================================= */
+
+            const desarrolloNuevo =
+                {};
+
+            objetivosViejosPendientes.forEach(
+                (objetivoViejo) => {
+
+                    const bloques =
+                        desarrollo[objetivoViejo.id];
+
+                    if (!bloques) {
+
+                        return;
+
+                    }
+
+
+                    const bloquesVigentes =
+                        bloques
+                            .filter(
+                                (bloque) =>
+                                    !(
+                                        bloque.tipo === "punto" &&
+                                        bloque.avance === 100
+                                    )
+                            )
+                            .map(
+                                (bloque) => ({
+
+                                    ...bloque,
+
+                                    id:
+                                        crypto.randomUUID(),
+
+                                    /*
+                                     * Reuniones anteriores a que
+                                     * se empezara a guardar
+                                     * fechaCreacion por punto no
+                                     * la traen: se usa la fecha
+                                     * de la reunión de origen
+                                     * como referencia.
+                                     */
+                                    ...(
+                                        bloque.tipo === "punto" &&
+                                        !bloque.fechaCreacion
+                                            ? { fechaCreacion: reunionOrigenFecha }
+                                            : {}
+                                    )
+
+                                })
+                            );
+
+
+                    desarrolloNuevo[
+                        mapaObjetivos[objetivoViejo.id]
+                    ] =
+                        agruparPorPrioridad(
+                            bloquesVigentes
+                        );
+
+                }
+            );
+
+
+            /* =================================================
+               GUARDAR EN LA REUNIÓN DESTINO
+               ================================================= */
+
+            await guardarSeccionReunion(
+                connection,
+                reunionId,
+                "objetivos",
+                objetivosNuevos
+            );
+
+            await guardarSeccionReunion(
+                connection,
+                reunionId,
+                "compromisos",
+                compromisosNuevos
+            );
+
+            await guardarSeccionReunion(
+                connection,
+                reunionId,
+                "desarrollo",
+                desarrolloNuevo
+            );
+
+
+            await connection.execute(
+                `
+                UPDATE reuniones
+                SET PendientesConsumidos = 1
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionOrigenId
+                ]
+            );
+
+            await connection.execute(
+                `
+                UPDATE reuniones
+                SET PendientesOrigenId = ?
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionOrigenId,
+                    reunionId
+                ]
+            );
+
+
+            await connection.commit();
+
+
+            return res.json({
+
+                ok: true,
+
+                aplicado:
+                    true,
+
+                reunionOrigenId:
+                    reunionOrigenId,
+
+                objetivos:
+                    objetivosNuevos.length,
+
+                compromisos:
+                    compromisosNuevos.length
+
+            });
+
+        }
+        catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+
+            }
+
+
+            console.error(
+                "ERROR AL HEREDAR PENDIENTES:",
+                error
+            );
+
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible heredar los pendientes.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+        finally {
+
+            if (connection) {
+
+                connection.release();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    RESINCRONIZAR COMPROMISOS DE UNA REUNIÓN FINALIZADA
    ========================================================= */
 
@@ -3036,6 +3740,674 @@ app.post(
                 connection.release();
 
             }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ELIMINAR REUNIÓN
+   ---------------------------------------------------------
+   Borra la reunión y todo lo que depende de ella
+   (compromisos migrados, participantes y secciones)
+   dentro de una sola transacción. Si la reunión había
+   heredado pendientes de otra (PendientesOrigenId), esa
+   reunión origen se desatasca (PendientesConsumidos = 0)
+   para que no pierda sus pendientes para siempre.
+   ========================================================= */
+
+app.delete(
+    "/api/reuniones/:id",
+    async (req, res) => {
+
+        let connection;
+
+        try {
+
+            const reunionId =
+                Number(
+                    req.params.id
+                );
+
+
+            if (!reunionId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de reunión no válido."
+
+                    });
+
+            }
+
+
+            connection =
+                await db.getConnection();
+
+            await connection.beginTransaction();
+
+
+            /*
+             * Si esta reunión había heredado pendientes de otra
+             * (PendientesOrigenId), al borrarla esa copia
+             * desaparece con ella. Hay que "desatascar" la
+             * reunión origen (PendientesConsumidos = 0) para que
+             * sus pendientes vuelvan a estar disponibles la
+             * próxima vez que se inicie una reunión — si no,
+             * quedan huérfanos para siempre.
+             */
+
+            const [origenRows] =
+                await connection.execute(
+                    `
+                    SELECT PendientesOrigenId
+                    FROM reuniones
+                    WHERE ReunionId = ?
+                    `,
+                    [
+                        reunionId
+                    ]
+                );
+
+            const pendientesOrigenId =
+                origenRows.length > 0
+                    ? origenRows[0].PendientesOrigenId
+                    : null;
+
+
+            await connection.execute(
+                `
+                DELETE FROM compromisos
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionId
+                ]
+            );
+
+            await connection.execute(
+                `
+                DELETE FROM reunion_participantes
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionId
+                ]
+            );
+
+            await connection.execute(
+                `
+                DELETE FROM reunion_secciones
+                WHERE ReunionId = ?
+                `,
+                [
+                    reunionId
+                ]
+            );
+
+            const [resultado] =
+                await connection.execute(
+                    `
+                    DELETE FROM reuniones
+                    WHERE ReunionId = ?
+                    `,
+                    [
+                        reunionId
+                    ]
+                );
+
+
+            if (
+                resultado.affectedRows === 0
+            ) {
+
+                await connection.rollback();
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "No se encontró la reunión."
+
+                    });
+
+            }
+
+
+            if (pendientesOrigenId) {
+
+                await connection.execute(
+                    `
+                    UPDATE reuniones
+                    SET PendientesConsumidos = 0
+                    WHERE ReunionId = ?
+                    `,
+                    [
+                        pendientesOrigenId
+                    ]
+                );
+
+            }
+
+
+            await connection.commit();
+
+
+            return res.json({
+
+                ok: true,
+
+                mensaje:
+                    "Reunión eliminada correctamente.",
+
+                pendientesRestaurados:
+                    Boolean(pendientesOrigenId)
+
+            });
+
+
+        }
+        catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+
+            }
+
+
+            console.error(
+                "ERROR AL ELIMINAR REUNIÓN:"
+            );
+
+            console.error(
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible eliminar la reunión.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+        finally {
+
+            if (connection) {
+
+                connection.release();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   REGISTRAR INNOVACIÓN
+   ========================================================= */
+
+app.post(
+    "/api/innovaciones",
+    uploadInnovacion.fields([
+        {
+            name: "vpnArchivo",
+            maxCount: 1
+        },
+        {
+            name: "evidenciaArchivo",
+            maxCount: 1
+        },
+        {
+            name: "evidenciaImagenes",
+            maxCount: 10
+        }
+    ]),
+    async (req, res) => {
+
+        let connection;
+
+        try {
+
+            const campos =
+                req.body;
+
+            const archivos =
+                req.files ||
+                {};
+
+
+            /* =============================================
+               VALIDACIÓN
+               ============================================= */
+
+            const camposObligatorios = {
+
+                areaId:
+                    campos.areaId,
+
+                responsableNombre:
+                    campos.responsableNombre,
+
+                responsableApellido:
+                    campos.responsableApellido,
+
+                nombre:
+                    campos.nombre,
+
+                actividad:
+                    campos.actividad,
+
+                servicio:
+                    campos.servicio,
+
+                problematica:
+                    campos.problematica,
+
+                objetivo:
+                    campos.objetivo,
+
+                estrategia:
+                    campos.estrategia,
+
+                debilidad:
+                    campos.debilidad,
+
+                accion1:
+                    campos.accion1,
+
+                accion2:
+                    campos.accion2,
+
+                accion3:
+                    campos.accion3,
+
+                justificacion:
+                    campos.justificacion
+
+            };
+
+            const faltante =
+                Object.entries(
+                    camposObligatorios
+                ).find(
+                    ([, valor]) =>
+                        !valor ||
+                        !String(valor).trim()
+                );
+
+            if (faltante) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Todos los campos obligatorios deben completarse."
+
+                    });
+
+            }
+
+
+            if (
+                !archivos.vpnArchivo ||
+                archivos.vpnArchivo.length === 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Debe adjuntar el Formato VPN."
+
+                    });
+
+            }
+
+
+            /* =============================================
+               INSERTAR INNOVACIÓN + ARCHIVOS (BLOB)
+               ============================================= */
+
+            connection =
+                await db.getConnection();
+
+            await connection.beginTransaction();
+
+            const [resultado] =
+                await connection.execute(
+                    `
+                    INSERT INTO innovaciones
+                    (
+                        usuario_id,
+                        area_id,
+                        area_nombre,
+                        responsable_nombre,
+                        responsable_apellido,
+                        nombre_innovacion,
+                        actividad_impacta,
+                        servicio_relacionado,
+                        problematica,
+                        objetivo,
+                        estrategia,
+                        debilidad,
+                        accion_1,
+                        accion_2,
+                        accion_3,
+                        accion_4,
+                        accion_5,
+                        justificacion_valuacion
+                    )
+                    VALUES
+                    (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    )
+                    `,
+                    [
+                        campos.usuarioId || null,
+                        campos.areaId,
+                        campos.areaNombre || null,
+                        campos.responsableNombre.trim(),
+                        campos.responsableApellido.trim(),
+                        campos.nombre.trim(),
+                        campos.actividad.trim(),
+                        campos.servicio.trim(),
+                        campos.problematica.trim(),
+                        campos.objetivo.trim(),
+                        campos.estrategia.trim(),
+                        campos.debilidad.trim(),
+                        campos.accion1.trim(),
+                        campos.accion2.trim(),
+                        campos.accion3.trim(),
+                        campos.accion4 ? campos.accion4.trim() : null,
+                        campos.accion5 ? campos.accion5.trim() : null,
+                        campos.justificacion.trim()
+                    ]
+                );
+
+            const innovacionId =
+                resultado.insertId;
+
+
+            const archivosAGuardar = [
+
+                {
+                    tipo:
+                        "vpn",
+
+                    archivo:
+                        archivos.vpnArchivo[0]
+                },
+
+                ...(
+                    archivos.evidenciaArchivo &&
+                    archivos.evidenciaArchivo[0]
+                        ? [{
+
+                            tipo:
+                                "evidencia_archivo",
+
+                            archivo:
+                                archivos.evidenciaArchivo[0]
+
+                        }]
+                        : []
+                ),
+
+                ...(archivos.evidenciaImagenes || []).map(
+                    (archivo) => ({
+
+                        tipo:
+                            "evidencia_imagen",
+
+                        archivo:
+                            archivo
+
+                    })
+                )
+
+            ];
+
+            for (const {
+                tipo,
+                archivo
+            } of archivosAGuardar) {
+
+                await connection.execute(
+                    `
+                    INSERT INTO innovacion_archivos
+                    (
+                        innovacion_id,
+                        tipo,
+                        nombre_original,
+                        tipo_mime,
+                        contenido
+                    )
+                    VALUES
+                    (
+                        ?, ?, ?, ?, ?
+                    )
+                    `,
+                    [
+                        innovacionId,
+                        tipo,
+                        archivo.originalname,
+                        archivo.mimetype,
+                        archivo.buffer
+                    ]
+                );
+
+            }
+
+
+            await connection.commit();
+
+
+            /* =============================================
+               RESPUESTA
+               ============================================= */
+
+            return res
+                .status(201)
+                .json({
+
+                    ok: true,
+
+                    mensaje:
+                        "Innovación registrada correctamente.",
+
+                    innovacion: {
+
+                        id:
+                            innovacionId
+
+                    }
+
+                });
+
+
+        }
+        catch (error) {
+
+            if (connection) {
+
+                await connection.rollback();
+
+            }
+
+
+            console.error(
+                "ERROR AL REGISTRAR INNOVACIÓN:"
+            );
+
+            console.error(
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "Error interno al registrar la innovación.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+        finally {
+
+            if (connection) {
+
+                connection.release();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   OBTENER ARCHIVO DE INNOVACIÓN
+   ---------------------------------------------------------
+   Sirve el contenido de un archivo (VPN, evidencia o imagen)
+   guardado como BLOB en innovacion_archivos.
+   ========================================================= */
+
+app.get(
+    "/api/innovaciones/archivos/:archivoId",
+    async (req, res) => {
+
+        try {
+
+            const archivoId =
+                Number(
+                    req.params.archivoId
+                );
+
+            if (!archivoId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de archivo no válido."
+
+                    });
+
+            }
+
+
+            const [rows] =
+                await db.execute(
+                    `
+                    SELECT
+                        nombre_original,
+                        tipo_mime,
+                        contenido
+                    FROM innovacion_archivos
+                    WHERE id = ?
+                    LIMIT 1
+                    `,
+                    [
+                        archivoId
+                    ]
+                );
+
+            if (rows.length === 0) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Archivo no encontrado."
+
+                    });
+
+            }
+
+
+            const archivo =
+                rows[0];
+
+            res.set(
+                "Content-Type",
+                archivo.tipo_mime ||
+                "application/octet-stream"
+            );
+
+            res.set(
+                "Content-Disposition",
+                `inline; filename="${encodeURIComponent(archivo.nombre_original)}"`
+            );
+
+            return res.send(
+                archivo.contenido
+            );
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR AL OBTENER ARCHIVO DE INNOVACIÓN:"
+            );
+
+            console.error(
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible obtener el archivo.",
+
+                    error:
+                        error.message
+
+                });
 
         }
 
