@@ -5,8 +5,7 @@ import {
 
 
 import {
-    saveData,
-    loadData
+    saveData
 } from "./storage.service.js";
 
 
@@ -24,10 +23,6 @@ import {
     confirmDialog
 } from "./confirmDialog.js";
 
-
-import {
-    heredarPendientes
-} from "./inheritance.js";
 
 import {
     API_URL
@@ -1732,7 +1727,8 @@ async function crearReunionBD(
     titulo,
     fechaInicio,
     duracion,
-    usuarioCreadorId
+    usuarioCreadorId,
+    heredarCompromisos
 ) {
 
     const fechaInicioObj =
@@ -1842,6 +1838,11 @@ async function crearReunionBD(
                         usuarioCreadorId:
                             Number(
                                 usuarioCreadorId
+                            ),
+
+                        heredarCompromisos:
+                            Boolean(
+                                heredarCompromisos
                             )
 
                     })
@@ -2065,7 +2066,10 @@ try {
             titulo,
             fechaProgramada,
             duracion,
-            usuarioSesion.id
+            usuarioSesion.id,
+            heredarCompromisosInput
+                ? heredarCompromisosInput.checked
+                : true
         );
 
 }
@@ -2086,18 +2090,6 @@ catch (error) {
     return;
 
 }
-
-
-/* =====================================================
-   GUARDAR PREFERENCIA DE HERENCIA
-   ===================================================== */
-
-saveData(
-    `flow.reunion-heredar.${reunionId}`,
-    heredarCompromisosInput
-        ? heredarCompromisosInput.checked
-        : true
-);
 
 
 /* =====================================================
@@ -2422,20 +2414,39 @@ async function iniciarReunionProgramada(
            HEREDAR PENDIENTES
            ===================================================== */
 
-        const heredarCompromisos =
-            loadData(
-                `flow.reunion-heredar.${reunionId}`,
-                true
+        /*
+         * Se calcula y se guarda en el servidor (no en
+         * localStorage) para que funcione sin importar en qué
+         * computadora se programó, finalizó o inició cada
+         * reunión.
+         */
+
+        try {
+
+            await fetch(
+                `${API_URL}/reuniones/${reunionId}/heredar-pendientes`,
+                {
+
+                    method:
+                        "POST"
+
+                }
             );
 
+        }
+        catch (error) {
 
-        heredarPendientes(
-            reunionId,
-            {
-                heredarCompromisos:
-                    heredarCompromisos
-            }
-        );
+            console.error(
+                "ERROR HEREDANDO PENDIENTES:",
+                error
+            );
+
+            /*
+             * No detenemos la reunión: si esto falla, la
+             * reunión simplemente arranca sin heredar nada.
+             */
+
+        }
 
 
         /* =====================================================
