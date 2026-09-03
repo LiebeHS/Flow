@@ -41,6 +41,11 @@
   cursor: pointer;
 }
 
+.development-block__bullet--convertido {
+  color: var(--color-success);
+  cursor: default;
+}
+
 .development-block__field {
   flex: 1;
   border: none;
@@ -333,6 +338,32 @@
   border-left: 3px solid var(--color-danger);
   padding-left: var(--space-xs);
   margin-left: calc(var(--space-xs) * -1);
+}
+
+/* =========================================================
+   PUNTO CONVERTIDO EN COMPROMISO
+   ========================================================= */
+
+.development-block--compromiso {
+  border-left: 3px solid var(--color-accent);
+  padding-left: var(--space-xs);
+  margin-left: calc(var(--space-xs) * -1);
+}
+
+.development-block__compromiso-badge {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  white-space: nowrap;
 }
 
 .development-block__priority {

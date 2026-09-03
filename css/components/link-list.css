@@ -1,8 +1,18 @@
+.link-list {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
 .link-list__list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
   margin-bottom: var(--space-md);
+}
+
+.link-list__list:empty {
+  margin-bottom: 0;
 }
 
 .link-list__item {
@@ -46,6 +56,14 @@
 
 .link-list__form {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.link-list__form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-sm);
 }
 
@@ -66,6 +84,42 @@
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(0, 48, 73, 0.12);
+}
+
+.link-list__separator {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.link-list__file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.link-list__file-label:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.link-list__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .link-list__add {

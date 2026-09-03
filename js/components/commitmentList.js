@@ -105,12 +105,21 @@ export function createCommitmentList({ container, storageKey, sincronizarTabla }
     }
 
     header.append(title, actions);
+    card.append(header);
+
+    if (data.vencidoInformativo) {
+      const completeBtn = document.createElement("button");
+      completeBtn.type = "button";
+      completeBtn.classList.add("commitment-card__complete-vencido");
+      completeBtn.textContent = "Marcar como completado";
+      card.append(completeBtn);
+    }
 
     const meta = document.createElement("div");
     meta.classList.add("commitment-card__meta");
     meta.textContent = `${data.usuarioAsignadoNombre || "?"} · ${data.fechaInicio || "?"} → ${data.fechaLimite || "?"} · ${data.vencidoInformativo ? "Vencido de la reunión anterior" : ESTADO_LABEL[data.estado]} · ${PRIORIDAD_LABEL[data.prioridad]}`;
 
-    card.append(header, meta);
+    card.append(meta);
     return card;
   }
 
@@ -165,6 +174,15 @@ export function createCommitmentList({ container, storageKey, sincronizarTabla }
   function removeCommitment(id) {
     items = items.filter((item) => item.id !== id);
     render();
+  }
+
+  /*
+   * Marca un compromiso vencido (heredado de una reunión anterior)
+   * como completado: deja de mostrarse como "Vencido" y ya no se
+   * vuelve a heredar en la siguiente reunión (ver server.js).
+   */
+  function completarVencido(id) {
+    updateCommitment(id, { estado: "completado", vencidoInformativo: false });
   }
 
   function readForm() {
@@ -281,6 +299,11 @@ export function createCommitmentList({ container, storageKey, sincronizarTabla }
 
     if (event.target.matches(".commitment-card__delete")) {
       removeCommitment(card.dataset.id);
+      return;
+    }
+
+    if (event.target.matches(".commitment-card__complete-vencido")) {
+      completarVencido(card.dataset.id);
     }
   });
 

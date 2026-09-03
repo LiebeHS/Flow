@@ -133,6 +133,25 @@
   color: var(--color-text-subtle);
 }
 
+.commitment-card__complete-vencido {
+  display: block;
+  margin: var(--space-2xs) 0 var(--space-xs);
+  padding: var(--space-2xs) var(--space-md);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.commitment-card__complete-vencido:hover {
+  border-color: var(--color-success);
+  color: var(--color-success-text);
+}
+
 .commitment-card__header {
   display: flex;
   justify-content: space-between;

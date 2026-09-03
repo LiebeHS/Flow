@@ -1,15 +1,23 @@
 import { loadData, saveData } from "../services/storage.service.js";
+import { API_URL } from "./config.js";
 
-export function createLinkList({ container, storageKey }) {
+export function createLinkList({ container, storageKey, reunionId }) {
   const list = container.querySelector(".link-list__list");
   const titleInput = container.querySelector(".link-list__title");
   const urlInput = container.querySelector(".link-list__url");
+  const fileInput = container.querySelector(".link-list__file");
   const addBtn = container.querySelector(".link-list__add");
 
   let items = loadData(storageKey);
 
   function esUrlValida(url) {
     return url.startsWith("http://") || url.startsWith("https://");
+  }
+
+  function urlDelItem(data) {
+    return data.tipo === "archivo"
+      ? `${API_URL}/enlaces/archivos/${data.archivoId}`
+      : data.url;
   }
 
   function createItem(data) {
@@ -19,8 +27,8 @@ export function createLinkList({ container, storageKey }) {
 
     const link = document.createElement("a");
     link.classList.add("link-list__link");
-    link.href = data.url;
-    link.textContent = data.titulo;
+    link.href = urlDelItem(data);
+    link.textContent = data.tipo === "archivo" ? `📎 ${data.titulo}` : data.titulo;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
 
@@ -40,8 +48,8 @@ export function createLinkList({ container, storageKey }) {
     saveData(storageKey, items);
   }
 
-  function addItem(titulo, url) {
-    items.push({ id: crypto.randomUUID(), titulo, url });
+  function addItem(data) {
+    items.push({ id: crypto.randomUUID(), ...data });
     render();
   }
 
@@ -50,20 +58,78 @@ export function createLinkList({ container, storageKey }) {
     render();
   }
 
-  function handleAdd() {
+  /*
+   * Sube el archivo (imagen o PDF) al servidor, que lo guarda
+   * como BLOB en reunion_enlace_archivos. Devuelve el metadato
+   * (archivoId, tipoMime) que se guarda en el JSON de "enlaces";
+   * el contenido del archivo nunca viaja por ese JSON.
+   */
+  async function subirArchivo(file) {
+    if (!reunionId) {
+      alert("No hay una reunión activa para subir el archivo.");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("archivo", file);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/reuniones/${reunionId}/enlaces/archivo`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.mensaje || data.error || "No fue posible subir el archivo.");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("ERROR SUBIENDO ARCHIVO DE ENLACE:", error);
+      alert(error.message || "No fue posible subir el archivo.");
+      return null;
+    }
+  }
+
+  async function handleAdd() {
     const titulo = titleInput.value.trim();
     const url = urlInput.value.trim();
+    const file = fileInput?.files?.[0] || null;
 
-    if (titulo === "" || url === "") return;
+    if (titulo === "") return;
 
-    if (!esUrlValida(url)) {
-      alert("La URL debe empezar por http:// o https://");
+    if (file) {
+      addBtn.disabled = true;
+      const subido = await subirArchivo(file);
+      addBtn.disabled = false;
+
+      if (!subido) return;
+
+      addItem({
+        tipo: "archivo",
+        titulo,
+        archivoId: subido.archivoId,
+        tipoMime: subido.tipoMime,
+      });
+    } else if (url !== "") {
+      if (!esUrlValida(url)) {
+        alert("La URL debe empezar por http:// o https://");
+        return;
+      }
+
+      addItem({ tipo: "url", titulo, url });
+    } else {
       return;
     }
 
-    addItem(titulo, url);
     titleInput.value = "";
     urlInput.value = "";
+    if (fileInput) fileInput.value = "";
     titleInput.focus();
   }
 

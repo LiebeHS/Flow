@@ -31,7 +31,8 @@ import {
 } from "./services/meetingLifecycle.js";
 
 import {
-    sectionKey
+    sectionKey,
+    getReunionActivaId
 } from "./services/session.js";
 
 import {
@@ -518,16 +519,19 @@ function montarReunion() {
 
     /*
      * =====================================================
-     * COMPETITIVIDAD
+     * COMPETITIVIDAD (incluye sus enlaces, mismo contenedor)
      * =====================================================
      */
+
+    const competitividadContainer =
+        reiniciarContenedor(
+            "#competitividad"
+        );
 
     createTextSection({
 
         container:
-            reiniciarContenedor(
-                "#competitividad"
-            ),
+            competitividadContainer,
 
         storageKey:
             sectionKey(
@@ -536,6 +540,21 @@ function montarReunion() {
 
         placeholder:
             "Notas sobre competitividad…"
+
+    });
+
+    createLinkList({
+
+        container:
+            competitividadContainer,
+
+        storageKey:
+            sectionKey(
+                "enlaces"
+            ),
+
+        reunionId:
+            getReunionActivaId()
 
     });
 
@@ -587,26 +606,6 @@ function montarReunion() {
 
     });
 
-
-    /*
-     * =====================================================
-     * ENLACES
-     * =====================================================
-     */
-
-    createLinkList({
-
-        container:
-            reiniciarContenedor(
-                "#enlaces"
-            ),
-
-        storageKey:
-            sectionKey(
-                "enlaces"
-            )
-
-    });
 
 }
 

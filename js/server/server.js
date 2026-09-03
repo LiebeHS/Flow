@@ -76,6 +76,48 @@ const uploadInnovacion =
 
 
 /* =========================================================
+   ARCHIVOS SUBIDOS (ENLACES DE COMPETITIVIDAD)
+   ---------------------------------------------------------
+   Mismo patrón que innovaciones: BLOB en MySQL. Solo se
+   permiten imágenes o PDF, hasta 10 MB.
+   ========================================================= */
+
+const uploadEnlaceArchivo =
+    multer({
+
+        storage:
+            multer.memoryStorage(),
+
+        limits: {
+            fileSize:
+                10 * 1024 * 1024
+        },
+
+        fileFilter:
+            (req, file, cb) => {
+
+                const permitido =
+                    file.mimetype.startsWith("image/") ||
+                    file.mimetype === "application/pdf";
+
+                if (!permitido) {
+
+                    return cb(
+                        new Error(
+                            "Solo se permiten imágenes o archivos PDF."
+                        )
+                    );
+
+                }
+
+                cb(null, true);
+
+            }
+
+    });
+
+
+/* =========================================================
    PRUEBA DEL SERVIDOR
    ========================================================= */
 
@@ -3108,6 +3150,13 @@ app.post(
             const compromisosNuevos =
                 [];
 
+            /*
+             * Los compromisos vencidos (vencidoInformativo === true)
+             * se siguen heredando reunión tras reunión mientras no
+             * se marquen como completados: solo "estado === completado"
+             * los saca de la herencia.
+             */
+
             const compromisosOrigen =
                 heredarCompromisos
                     ? (
@@ -3116,8 +3165,7 @@ app.post(
                             : []
                     ).filter(
                         (compromiso) =>
-                            compromiso.estado !== "completado" &&
-                            !compromiso.vencidoInformativo
+                            compromiso.estado !== "completado"
                     )
                     : [];
 
@@ -3852,6 +3900,16 @@ app.delete(
                 ]
             );
 
+            await connection.execute(
+                `
+                DELETE FROM reunion_enlace_archivos
+                WHERE reunion_id = ?
+                `,
+                [
+                    reunionId
+                ]
+            );
+
             const [resultado] =
                 await connection.execute(
                     `
@@ -4392,6 +4450,260 @@ app.get(
             );
 
             console.error(
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    ok: false,
+
+                    mensaje:
+                        "No fue posible obtener el archivo.",
+
+                    error:
+                        error.message
+
+                });
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SUBIR ARCHIVO DE ENLACE (COMPETITIVIDAD)
+   ---------------------------------------------------------
+   Guarda el archivo como BLOB en reunion_enlace_archivos,
+   ligado a la reunión. El metadato (id devuelto aquí) es lo
+   que se guarda en el JSON de la sección "enlaces".
+   ========================================================= */
+
+app.post(
+    "/api/reuniones/:id/enlaces/archivo",
+    (req, res) => {
+
+        uploadEnlaceArchivo.single("archivo")(
+            req,
+            res,
+            async (errorSubida) => {
+
+                if (errorSubida) {
+
+                    return res
+                        .status(400)
+                        .json({
+
+                            ok: false,
+
+                            mensaje:
+                                errorSubida.message ||
+                                "No fue posible subir el archivo."
+
+                        });
+
+                }
+
+
+                try {
+
+                    const reunionId =
+                        Number(
+                            req.params.id
+                        );
+
+                    if (!reunionId) {
+
+                        return res
+                            .status(400)
+                            .json({
+
+                                ok: false,
+
+                                mensaje:
+                                    "ID de reunión no válido."
+
+                            });
+
+                    }
+
+
+                    if (!req.file) {
+
+                        return res
+                            .status(400)
+                            .json({
+
+                                ok: false,
+
+                                mensaje:
+                                    "No se recibió ningún archivo."
+
+                            });
+
+                    }
+
+
+                    const [result] =
+                        await db.execute(
+                            `
+                            INSERT INTO reunion_enlace_archivos
+                            (
+                                reunion_id,
+                                nombre_original,
+                                tipo_mime,
+                                contenido
+                            )
+                            VALUES
+                            (
+                                ?, ?, ?, ?
+                            )
+                            `,
+                            [
+                                reunionId,
+                                req.file.originalname,
+                                req.file.mimetype,
+                                req.file.buffer
+                            ]
+                        );
+
+                    return res.json({
+
+                        ok: true,
+
+                        archivoId:
+                            result.insertId,
+
+                        nombreOriginal:
+                            req.file.originalname,
+
+                        tipoMime:
+                            req.file.mimetype
+
+                    });
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "ERROR AL SUBIR ARCHIVO DE ENLACE:",
+                        error
+                    );
+
+                    return res
+                        .status(500)
+                        .json({
+
+                            ok: false,
+
+                            mensaje:
+                                "No fue posible subir el archivo.",
+
+                            error:
+                                error.message
+
+                        });
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   OBTENER ARCHIVO DE ENLACE (COMPETITIVIDAD)
+   ---------------------------------------------------------
+   Sirve el contenido de un archivo (imagen o PDF) guardado
+   como BLOB en reunion_enlace_archivos.
+   ========================================================= */
+
+app.get(
+    "/api/enlaces/archivos/:archivoId",
+    async (req, res) => {
+
+        try {
+
+            const archivoId =
+                Number(
+                    req.params.archivoId
+                );
+
+            if (!archivoId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "ID de archivo no válido."
+
+                    });
+
+            }
+
+
+            const [rows] =
+                await db.execute(
+                    `
+                    SELECT
+                        nombre_original,
+                        tipo_mime,
+                        contenido
+                    FROM reunion_enlace_archivos
+                    WHERE id = ?
+                    LIMIT 1
+                    `,
+                    [
+                        archivoId
+                    ]
+                );
+
+            if (rows.length === 0) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        ok: false,
+
+                        mensaje:
+                            "Archivo no encontrado."
+
+                    });
+
+            }
+
+
+            const archivo =
+                rows[0];
+
+            res.set(
+                "Content-Type",
+                archivo.tipo_mime ||
+                "application/octet-stream"
+            );
+
+            res.set(
+                "Content-Disposition",
+                `inline; filename="${encodeURIComponent(archivo.nombre_original)}"`
+            );
+
+            return res.send(
+                archivo.contenido
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "ERROR AL OBTENER ARCHIVO DE ENLACE:",
                 error
             );
 

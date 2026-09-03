@@ -296,7 +296,8 @@ export function createHistoryView({
 
         const confirmado =
             await confirmDialog(
-                "¿Eliminar esta reunión? Se borrará junto con sus objetivos, compromisos y participantes. Esta acción no se puede deshacer."
+                "¿Eliminar esta reunión? Se borrará junto con sus objetivos, compromisos y participantes. Esta acción no se puede deshacer.",
+                { danger: true }
             );
 
         if (!confirmado) {

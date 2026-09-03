@@ -88,7 +88,8 @@ export function createEditableList({container, itemName, storageKey, onChange}){
     }
     async function removeItem(id) {
     const confirmado = await confirmDialog(
-        "¿Estás seguro de eliminar? Tus datos relacionados a este objetivo en la sección de desarrollo se van a eliminar."
+        "¿Estás seguro de eliminar? Tus datos relacionados a este objetivo en la sección de desarrollo se van a eliminar.",
+        { danger: true }
     );
 
     if (!confirmado) return;

@@ -46,3 +46,7 @@ dialog{
   background-color: var(--color-success);
   color: #ffffff;
 }
+
+.confirm-dialog__accept--danger {
+  background-color: var(--color-danger);
+}

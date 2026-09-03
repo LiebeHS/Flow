@@ -105,6 +105,47 @@ export function createDevelopmentTable({ container, storageKey }) {
     render();
   }
 
+  /*
+   * "Bloque" = un subtítulo y todo lo que le sigue hasta el
+   * siguiente subtítulo (o el final del arreglo). Mueve el punto
+   * al final de su propio bloque, justo antes del subtítulo
+   * siguiente.
+   */
+  function moverAlFinalDeSuBloque(objetivoId, blockId) {
+    const blocks = getBlocks(objetivoId);
+    const index = blocks.findIndex((b) => b.id === blockId);
+    if (index === -1) return;
+
+    const [block] = blocks.splice(index, 1);
+
+    let insertIndex = blocks.length;
+    for (let i = index; i < blocks.length; i++) {
+      if (blocks[i].tipo === "subtitulo") {
+        insertIndex = i;
+        break;
+      }
+    }
+
+    blocks.splice(insertIndex, 0, block);
+  }
+
+  /*
+   * Convierte un punto en compromiso sin eliminarlo del
+   * desarrollo: se marca como "ya convertido" (para no volver a
+   * abrir el diálogo desde el mismo punto) y se recoloca al
+   * final de su bloque.
+   */
+  function convertirPuntoEnCompromiso(objetivoId, blockId) {
+    const block = getBlocks(objetivoId).find((b) => b.id === blockId);
+    if (!block) return;
+
+    block.compromisoCreado = true;
+    moverAlFinalDeSuBloque(objetivoId, blockId);
+
+    persist();
+    render();
+  }
+
   function updateBlockText(objetivoId, blockId, texto) {
     const block = getBlocks(objetivoId).find((b) => b.id === blockId);
     if (block) block.texto = texto;
@@ -156,11 +197,23 @@ export function createDevelopmentTable({ container, storageKey }) {
       wrapper.classList.add("development-block--prioridad");
     }
 
+    if (block.tipo === "punto" && block.compromisoCreado) {
+      wrapper.classList.add("development-block--compromiso");
+    }
+
     if (block.tipo === "punto") {
       const bullet = document.createElement("span");
       bullet.classList.add("development-block__bullet");
-      bullet.textContent = "•";
-      bullet.title = "Convertir esta actividad en compromiso";
+
+      if (block.compromisoCreado) {
+        bullet.classList.add("development-block__bullet--convertido");
+        bullet.textContent = "✓";
+        bullet.title = "Ya convertido en compromiso";
+      } else {
+        bullet.textContent = "•";
+        bullet.title = "Convertir esta actividad en compromiso";
+      }
+
       wrapper.appendChild(bullet);
     }
 
@@ -222,6 +275,13 @@ export function createDevelopmentTable({ container, storageKey }) {
       fecha.classList.add("development-block__fecha");
       fecha.textContent = formatearFechaCreacion(block.fechaCreacion);
       wrapper.appendChild(fecha);
+    }
+
+    if (block.compromisoCreado) {
+      const badge = document.createElement("span");
+      badge.classList.add("development-block__compromiso-badge");
+      badge.textContent = "Compromiso";
+      wrapper.appendChild(badge);
     }
   }
 
@@ -439,6 +499,7 @@ function createInsertButton(tipo, label, index) {
     const objetivoId = block.closest(".development__row")?.dataset.id;
     const punto = getBlocks(objetivoId).find((b) => b.id === block.dataset.blockId);
     if (!punto) return;
+    if (punto.compromisoCreado) return;
 
     document.dispatchEvent(
       new CustomEvent("flow:punto-a-compromiso", {
@@ -459,7 +520,7 @@ function createInsertButton(tipo, label, index) {
     const { objetivoId, blockId } = event.detail || {};
     if (!objetivoId || !blockId) return;
 
-    removeBlock(objetivoId, blockId);
+    convertirPuntoEnCompromiso(objetivoId, blockId);
   }
 
   document.addEventListener(

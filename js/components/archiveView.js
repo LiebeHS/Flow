@@ -682,12 +682,15 @@ export function createArchiveView() {
         });
 
 
+        const competitividadContainer =
+            reiniciarContenedor(
+                "#archive-competitividad"
+            );
+
         createTextSection({
 
             container:
-                reiniciarContenedor(
-                    "#archive-competitividad"
-                ),
+                competitividadContainer,
 
             storageKey:
                 claveSeccion(
@@ -696,6 +699,20 @@ export function createArchiveView() {
 
             placeholder:
                 "Notas sobre competitividad…"
+
+        });
+
+        createLinkList({
+
+            container:
+                competitividadContainer,
+
+            storageKey:
+                claveSeccion(
+                    "enlaces"
+                ),
+
+            reunionId
 
         });
 
@@ -735,20 +752,6 @@ export function createArchiveView() {
 
         });
 
-
-        createLinkList({
-
-            container:
-                reiniciarContenedor(
-                    "#archive-enlaces"
-                ),
-
-            storageKey:
-                claveSeccion(
-                    "enlaces"
-                )
-
-        });
 
     }
 
