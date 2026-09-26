@@ -9,6 +9,10 @@ const path = require("path");
 const {
     enviarRecordatoriosCompromisos
 } = require("../services/compromisoReminderService");
+const {
+    enviarNotificacionNuevaEvaluacion,
+    enviarRecordatoriosEvaluaciones
+} = require("../services/evaluacionReminderService");
 
 const db = require("./db");
 
@@ -10532,28 +10536,74 @@ app.post(
 
             }
 
-            const [resultado] =
-                await db.execute(
-                    `
-                    INSERT INTO evaluacion_personalizada
-                        (titulo, descripcion, preguntas_json, destinatarios, activa, fecha_cierre, creado_por)
-                    VALUES (?, ?, ?, ?, 1, ?, ?)
-                    `,
-                    [
-                        titulo,
-                        descripcion || null,
-                        JSON.stringify(validacion.preguntas),
-                        destinatarios.join(","),
-                        fechaCierre,
-                        usuarioSolicitante.id
-                    ]
-                );
+const [resultado] =
+    await db.execute(
+        `
+        INSERT INTO evaluacion_personalizada
+            (
+                titulo,
+                descripcion,
+                preguntas_json,
+                destinatarios,
+                activa,
+                fecha_cierre,
+                creado_por
+            )
+        VALUES (?, ?, ?, ?, 1, ?, ?)
+        `,
+        [
+            titulo,
+            descripcion || null,
+            JSON.stringify(validacion.preguntas),
+            destinatarios.join(","),
+            fechaCierre,
+            usuarioSolicitante.id
+        ]
+    );
 
-            return res.json({
-                ok: true,
-                mensaje: "Evaluación creada correctamente.",
-                evaluacionId: resultado.insertId
-            });
+
+const evaluacionId =
+    resultado.insertId;
+
+
+/*
+ * =====================================================
+ * ENVIAR NOTIFICACIONES
+ * =====================================================
+ *
+ * Si el correo falla, NO eliminamos la evaluación.
+ * La evaluación ya fue creada correctamente.
+ *
+ * El error se registra en consola.
+ */
+
+try {
+
+    await enviarNotificacionNuevaEvaluacion(
+        evaluacionId
+    );
+
+}
+catch (errorCorreo) {
+
+    console.error(
+        "ERROR ENVIANDO NOTIFICACIONES DE LA EVALUACIÓN:",
+        errorCorreo
+    );
+
+}
+
+
+return res.json({
+
+    ok: true,
+
+    mensaje:
+        "Evaluación creada correctamente.",
+
+    evaluacionId
+
+});
 
         }
         catch (error) {
@@ -11438,6 +11488,20 @@ function programarRecordatoriosCompromisos() {
                 );
 
             }
+
+            try {
+
+    await enviarRecordatoriosEvaluaciones();
+
+}
+catch (error) {
+
+    console.error(
+        "ERROR EN RECORDATORIOS DE EVALUACIONES:",
+        error
+    );
+
+}
 
 
             /*
