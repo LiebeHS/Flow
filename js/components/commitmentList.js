@@ -3,6 +3,7 @@ import { API_URL } from "./config.js";
 import { capitalizar } from "../utils/capitalize.js";
 import { confirmarEliminacion, avisoDialog } from "../services/confirmDialog.js";
 import { getUsuarioActual, headerUsuario } from "../services/auth.service.js";
+import { generarUUID } from "../utils/generarUUID.js";
 
 export const ESTADO_LABEL = {
   "pendiente": "Pendiente",
@@ -202,7 +203,7 @@ export function createCommitmentList({ container, storageKey, sincronizarTabla }
   }
 
   function addCommitment(data) {
-    items.push({ id: crypto.randomUUID(), ...data });
+    items.push({ id: generarUUID(), ...data });
     render();
   }
 
